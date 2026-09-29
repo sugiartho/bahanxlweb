@@ -1,0 +1,153 @@
+<h1 class="text-2xl font-bold mb-2">Loop Beli Family</h1>
+<div class="text-xs text-slate-400 mb-4">
+  Family <span class="font-mono text-slate-200">{{family_code}}</span> ·
+  start opsi #{{start_from}} · delay {{delay_seconds}}s · method Balance
+</div>
+
+<div class="card mb-4">
+  <div class="flex items-center justify-between gap-2 mb-3">
+    <div id="status-text" class="text-sm text-slate-300">⏳ Menginisialisasi…</div>
+    <div id="status-pill" class="text-xs px-2 py-1 rounded bg-slate-800 text-slate-300">running</div>
+  </div>
+  <div class="mb-1 flex justify-between text-xs text-slate-400">
+    <span><span id="seq-cur">0</span> / <span id="seq-total">—</span></span>
+    <span id="seq-pct">0%</span>
+  </div>
+  <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+    <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 transition-all duration-300" style="width: 0%"></div>
+  </div>
+  <div class="grid grid-cols-3 gap-2 mt-4">
+    <div class="bg-emerald-500/10 rounded-xl p-2 text-center">
+      <div class="text-xl font-bold text-emerald-300" id="cnt-ok">0</div>
+      <div class="text-xs text-emerald-200/70">Sukses</div>
+    </div>
+    <div class="bg-amber-500/10 rounded-xl p-2 text-center">
+      <div class="text-xl font-bold text-amber-300" id="cnt-fail">0</div>
+      <div class="text-xs text-amber-200/70">Ditolak</div>
+    </div>
+    <div class="bg-red-500/10 rounded-xl p-2 text-center">
+      <div class="text-xl font-bold text-red-300" id="cnt-err">0</div>
+      <div class="text-xs text-red-200/70">Error</div>
+    </div>
+  </div>
+  <div id="current-box" class="mt-4 hidden">
+    <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Sedang Diproses</div>
+    <div class="rounded-[14px] p-3">
+      <div id="cur-title" class="font-medium text-sm"></div>
+      <div id="cur-step" class="text-xs text-slate-400 mt-1"></div>
+    </div>
+  </div>
+</div>
+
+<div class="flex gap-2 mb-4">
+  <button id="btn-stop" class="btn btn-danger text-sm hidden">⏹ Stop</button>
+  <a class="btn btn-secondary text-sm" href="/" data-no-loader>← Beranda</a>
+  <a id="btn-retry" class="btn btn-secondary text-sm hidden" href="javascript:location.reload()" data-no-loader>↻ Ulangi</a>
+</div>
+
+<details open class="card">
+  <summary class="cursor-pointer text-sm font-medium text-slate-300">Detail Log</summary>
+  <div id="log" class="mt-3 font-mono text-xs space-y-0.5 rounded-xl p-3 max-h-96 overflow-y-auto"></div>
+</details>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const log = $('log'), statusText = $('status-text'), statusPill = $('status-pill'),
+        seqCur = $('seq-cur'), seqTotal = $('seq-total'), seqPct = $('seq-pct'),
+        bar = $('progress-bar'),
+        cntOk = $('cnt-ok'), cntFail = $('cnt-fail'), cntErr = $('cnt-err'),
+        curBox = $('current-box'), curTitle = $('cur-title'), curStep = $('cur-step'),
+        btnStop = $('btn-stop'), btnRetry = $('btn-retry');
+  let total = 0;
+
+  function add(line, color){
+    const div = document.createElement('div');
+    div.textContent = line;
+    if (color) div.style.color = color;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+  }
+  function updateSummary(s){
+    if (!s) return;
+    if ('ok' in s) cntOk.textContent = s.ok;
+    if ('fail' in s) cntFail.textContent = s.fail;
+    if ('err' in s) cntErr.textContent = s.err;
+  }
+  function updateSeq(seq){
+    if (!seq) return;
+    seqCur.textContent = seq;
+    if (total) {
+      const pct = Math.min(100, Math.round(seq / total * 100));
+      seqPct.textContent = pct + '%';
+      bar.style.width = pct + '%';
+    }
+  }
+
+  const url = '/purchase/family-loop/stream?family_code={{family_code_encoded}}&start_from={{start_from}}&delay_seconds={{delay_seconds}}&use_decoy={{use_decoy_str}}';
+  const es = new EventSource(url);
+  btnStop.classList.remove('hidden');
+  btnStop.addEventListener('click', () => {
+    es.close();
+    statusText.textContent = '⏹ Dihentikan oleh user';
+    statusPill.textContent = 'stopped'; statusPill.className = 'text-xs px-2 py-1 rounded bg-amber-500/30 text-amber-200';
+    btnStop.classList.add('hidden'); btnRetry.classList.remove('hidden');
+    curBox.classList.add('hidden');
+  });
+
+  es.addEventListener('phase', e => {
+    const d = JSON.parse(e.data);
+    statusText.textContent = d.msg;
+    add(d.msg, '#94a3b8');
+  });
+  es.addEventListener('info', e => {
+    const d = JSON.parse(e.data);
+    if (d.total) { total = d.total; seqTotal.textContent = total; }
+    statusText.textContent = d.msg;
+    add(d.msg, '#a5b4fc');
+  });
+  es.addEventListener('progress', e => {
+    const d = JSON.parse(e.data);
+    if (d.seq) updateSeq(d.seq);
+    if (d.step === 'start') {
+      curBox.classList.remove('hidden');
+      curTitle.textContent = `#${d.seq}/${d.total || '?'} · ${d.variant} · ${d.option}` + (d.price ? ` — Rp ${Number(d.price).toLocaleString('id-ID')}` : '');
+      curStep.textContent = 'Memulai…';
+    } else if (curStep) {
+      curStep.textContent = d.msg.replace(/^\s*↳\s*/, '');
+    }
+    add(d.msg, '#e2e8f0');
+  });
+  es.addEventListener('success', e => {
+    const d = JSON.parse(e.data);
+    if (d.summary) updateSummary(d.summary);
+    add(d.msg, '#4ade80');
+  });
+  es.addEventListener('fail', e => {
+    const d = JSON.parse(e.data);
+    if (d.summary) updateSummary(d.summary);
+    add(d.msg, '#fbbf24');
+  });
+  es.addEventListener('error', e => {
+    try {
+      const d = JSON.parse(e.data);
+      add(d.msg, '#f87171');
+      statusText.textContent = d.msg;
+    } catch { add('Koneksi SSE terputus / stream error', '#f87171'); }
+    statusPill.textContent = 'error'; statusPill.className = 'text-xs px-2 py-1 rounded bg-red-500/30 text-red-200';
+    es.close();
+    btnStop.classList.add('hidden'); btnRetry.classList.remove('hidden');
+  });
+  es.addEventListener('done', e => {
+    const d = JSON.parse(e.data);
+    if (d.summary) updateSummary(d.summary);
+    add(d.msg, '#a5b4fc');
+    statusText.textContent = d.msg;
+    statusPill.textContent = 'done'; statusPill.className = 'text-xs px-2 py-1 rounded bg-emerald-500/30 text-emerald-200';
+    bar.style.width = '100%'; seqPct.textContent = '100%';
+    curBox.classList.add('hidden');
+    btnStop.classList.add('hidden'); btnRetry.classList.remove('hidden');
+    es.close();
+  });
+})();
+</script>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Store Families · Webui-XL{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4 gap-3">
+  <h1 class="text-2xl font-bold"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> Store Families</h1>
+  <form method="get" class="text-sm">
+    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="enterprise" value="true" {% if enterprise %}checked{% endif %} onchange="this.form.submit()"> <span class="text-slate-300">Enterprise</span></label>
+  </form>
+</div>
+
+<p class="text-sm text-slate-400 mb-4">Kategori paket. Klik buat lihat opsi-opsi dalam family-nya.</p>
+
+{% if not families %}
+<div class="card text-slate-400 text-sm">Tidak ada family.</div>
+{% endif %}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+{% for f in families %}
+<a href="/packages/by-family?code={{ f.id }}" class="card flex items-center gap-3 group">
+  {% if f.icon %}<img src="{{ f.icon }}" alt="" class="w-10 h-10 rounded bg-slate-800 object-contain shrink-0">{% else %}<div class="w-10 h-10 rounded bg-slate-800 flex items-center justify-center shrink-0 text-slate-400"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>{% endif %}
+  <div class="min-w-0">
+    <div class="font-medium group-hover:text-indigo-300 truncate">{{ f.label }}</div>
+    <div class="text-xs text-slate-500 font-mono truncate">{{ f.id }}</div>
+  </div>
+</a>
+{% endfor %}
+</div>
+{% endblock %}

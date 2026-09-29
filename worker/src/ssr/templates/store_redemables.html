@@ -1,0 +1,47 @@
+<div class="flex items-center justify-between mb-4 gap-3">
+  <h1 class="text-2xl font-bold">Redemables</h1>
+  <form method="get" class="text-sm">
+    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="enterprise" value="true" {{#enterprise}}checked{{/enterprise}} onchange="this.form.submit()"> <span class="text-slate-300">Enterprise</span></label>
+  </form>
+</div>
+
+<p class="text-sm text-slate-400 mb-4">Reward, voucher, atau bonus yang bisa lo klaim atau tukar pakai poin MyRewards. Klik item untuk buka katalog paket poin.</p>
+
+{{#has_points}}
+<div class="card mb-4 flex items-center justify-between gap-3">
+  <div>
+    <div class="text-xs text-slate-400">Saldo poin kamu</div>
+    <div class="text-xl font-bold text-amber-300">{{current_points_fmt}} Poin</div>
+  </div>
+  <div class="text-xs text-slate-500 text-right">Cek tier &amp; riwayat di dashboard</div>
+</div>
+{{/has_points}}
+
+{{^has_categories}}<div class="card text-slate-400 text-sm">Belum ada redemable yang tersedia.</div>{{/has_categories}}
+{{#categories}}
+<section class="mb-6">
+  <h2 class="text-sm uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-2">
+    {{#has_category_href}}<a href="{{category_href}}" class="hover:text-emerald-300">{{name}}</a>{{/has_category_href}}
+    {{^has_category_href}}<span>{{name}}</span>{{/has_category_href}}
+    {{#show_code}}<span class="text-[10px] font-mono text-slate-600">{{code}}</span>{{/show_code}}
+  </h2>
+  {{^has_items}}<div class="card text-slate-500 text-sm">Kosong — belum ada promo aktif di kategori ini.</div>{{/has_items}}
+  {{#has_items}}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+  {{#redeem_items}}
+    {{#has_href}}<a href="{{href}}" class="card group flex gap-3">{{/has_href}}
+    {{^has_href}}<div class="card opacity-70 flex gap-3">{{/has_href}}
+      {{#has_icon}}<img src="{{icon}}" alt="" class="w-14 h-14 rounded bg-slate-800 object-contain shrink-0">{{/has_icon}}
+      {{^has_icon}}<div class="w-14 h-14 rounded bg-emerald-500/10 flex items-center justify-center text-2xl shrink-0">🎁</div>{{/has_icon}}
+      <div class="min-w-0 flex-1">
+        <div class="font-medium group-hover:text-emerald-300 line-clamp-2">{{name}}</div>
+        {{#has_valid_until}}<div class="text-xs text-slate-500 mt-1">⏱ s/d {{valid_until}}</div>{{/has_valid_until}}
+        {{#has_href}}<span class="inline-block text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 mt-1">{{action_label}} · Buka katalog</span>{{/has_href}}
+        {{^has_href}}{{#action_type}}<span class="inline-block text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 mt-1">{{action_label}} (belum didukung)</span>{{/action_type}}{{/has_href}}
+      </div>
+    {{#has_href}}</a>{{/has_href}}{{^has_href}}</div>{{/has_href}}
+  {{/redeem_items}}
+  </div>
+  {{/has_items}}
+</section>
+{{/categories}}

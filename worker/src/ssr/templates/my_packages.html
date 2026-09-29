@@ -1,0 +1,62 @@
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Paket Saya</h1>
+  <a href="/packages/my" class="text-xs text-slate-400 hover:text-slate-200">↻ Refresh</a>
+</div>
+
+{{#msg_ok}}<div class="alert-success">Berhasil unsubscribe</div>{{/msg_ok}}
+{{#msg_fail}}<div class="alert-error">Gagal unsubscribe</div>{{/msg_fail}}
+
+{{^has_quotas}}
+<div class="card text-slate-400">
+  Tidak ada paket aktif terdeteksi.
+  {{#show_raw}}
+  <details class="mt-2"><summary class="text-xs cursor-pointer text-slate-500">Raw response</summary>
+    <pre class="text-xs overflow-x-auto rounded-xl p-2 mt-1">{{raw_json}}</pre>
+  </details>
+  {{/show_raw}}
+</div>
+{{/has_quotas}}
+
+<div class="space-y-3">
+{{#quotas}}
+<div class="card">
+  <div class="flex items-start justify-between gap-3">
+    <div class="min-w-0">
+      <div class="text-xs text-slate-400 truncate">{{group_name}}</div>
+      <div class="font-bold text-lg truncate">{{name}}</div>
+      {{#has_expired_at}}<div class="text-xs text-slate-500 mt-0.5">Aktif s/d {{expired_at_display}}</div>{{/has_expired_at}}
+    </div>
+    <div class="flex gap-2 shrink-0">
+      <a class="btn btn-secondary text-xs" href="/packages/by-option?code={{quota_code}}">Detail</a>
+      <form action="/packages/my/unsubscribe" method="post"
+            data-confirm="Paket bakal di-stop sebelum masa aktif habis."
+            data-confirm-title="Unsubscribe paket?"
+            data-confirm-variant="danger"
+            data-confirm-ok="Unsubscribe">
+        <input type="hidden" name="quota_code" value="{{quota_code}}">
+        <input type="hidden" name="product_domain" value="{{product_domain}}">
+        <input type="hidden" name="product_subscription_type" value="{{product_subscription_type}}">
+        <button class="btn btn-danger text-xs" type="submit">Stop</button>
+      </form>
+    </div>
+  </div>
+  {{#has_benefits}}
+  <div class="mt-4 space-y-3">
+  {{#benefits}}
+    <div>
+      <div class="flex items-center justify-between text-sm mb-1">
+        <div class="font-medium">{{name}}{{#is_unlimited}} <span class="neu-badge text-xs">∞ Unlimited</span>{{/is_unlimited}}</div>
+        {{^is_unlimited}}<div class="text-xs text-slate-400 font-mono">{{rem_disp}}{{#unit}} {{unit}}{{/unit}} / {{tot_disp}}{{#unit}} {{unit}}{{/unit}}</div>{{/is_unlimited}}
+      </div>
+      {{^is_unlimited}}
+      <div class="neu-progress">
+        <div class="neu-progress-bar" style="width: {{pct}}%"></div>
+      </div>
+      {{/is_unlimited}}
+    </div>
+  {{/benefits}}
+  </div>
+  {{/has_benefits}}
+</div>
+{{/quotas}}
+</div>

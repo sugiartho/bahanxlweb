@@ -1,0 +1,43 @@
+<div class="flex items-center justify-between mb-4 gap-3">
+  <div>
+    <a href="{{back_href}}" class="text-xs text-slate-400 hover:text-slate-200">← Redemables</a>
+    <h1 class="text-2xl font-bold mt-1">{{category_title}}</h1>
+  </div>
+  <form method="get" class="text-sm">
+    <input type="hidden" name="code" value="{{category_code}}">
+    <input type="hidden" name="source" value="{{source}}">
+    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="enterprise" value="true" {{#enterprise}}checked{{/enterprise}} onchange="this.form.submit()"> <span class="text-slate-300">Enterprise</span></label>
+  </form>
+</div>
+
+{{#has_points}}
+<div class="card mb-4 text-sm">
+  <div class="text-slate-400">Saldo poin</div>
+  <div class="text-xl font-bold text-amber-300">{{current_points_fmt}} Poin</div>
+</div>
+{{/has_points}}
+
+<p class="text-sm text-slate-400 mb-4">Pilih family paket reward di bawah. Harga ditampilkan dalam <b>Poin</b> di halaman detail.</p>
+
+{{^has_families}}
+<div class="card text-slate-400 text-sm space-y-2">
+  <p>Belum ada paket di kategori ini untuk akun lo. Coba refresh atau cek lagi nanti — katalog XL Poin kadang kosong di API MyXL.</p>
+  {{#show_debug}}
+  <p class="text-[10px] font-mono text-slate-600">debug: families API status={{debug_api_status}}{{#debug_res_keys}} · data keys={{debug_res_keys}}{{/debug_res_keys}}</p>
+  {{/show_debug}}
+</div>
+{{/has_families}}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+{{#families}}
+<a href="{{href}}" class="card flex items-center gap-3 group">
+  {{#has_icon}}<img src="{{icon}}" alt="" class="w-10 h-10 rounded bg-slate-800 object-contain shrink-0">{{/has_icon}}
+  {{^has_icon}}<div class="w-10 h-10 rounded bg-amber-500/10 flex items-center justify-center shrink-0 text-lg">🎁</div>{{/has_icon}}
+  <div class="min-w-0">
+    <div class="font-medium group-hover:text-amber-300 truncate">{{label}}</div>
+    {{#has_points_label}}<div class="text-xs text-amber-400">{{points_label}}</div>{{/has_points_label}}
+    <div class="text-xs text-slate-500 font-mono truncate">{{id}}</div>
+  </div>
+</a>
+{{/families}}
+</div>

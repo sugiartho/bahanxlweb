@@ -1,0 +1,26 @@
+<div class="flex items-center justify-between mb-4 gap-3">
+  <h1 class="text-2xl font-bold">Store Segments</h1>
+  <form method="get" class="text-sm">
+    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="enterprise" value="true" {{#enterprise}}checked{{/enterprise}} onchange="this.form.submit()"> <span class="text-slate-300">Enterprise</span></label>
+  </form>
+</div>
+{{^has_segments}}<div class="card text-slate-400 text-sm">Tidak ada segment.</div>{{/has_segments}}
+{{#segments}}
+<section class="mb-6">
+  <h2 class="text-sm uppercase tracking-wider text-slate-400 mb-2">{{title}}</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+  {{#banners}}
+    {{#has_href}}<a href="{{href}}" class="card group overflow-hidden">{{/has_href}}
+    {{^has_href}}<div class="card opacity-70">{{/has_href}}
+      {{#image_url}}<div class="aspect-[16/9] -mx-4 -mt-4 mb-3 bg-slate-800 overflow-hidden"><img src="{{image_url}}" alt="" class="w-full h-full object-cover"></div>{{/image_url}}
+      <div class="font-bold leading-snug group-hover:text-indigo-300 line-clamp-2">{{title}}</div>
+      {{#family_name}}<div class="text-xs text-slate-400 mt-0.5">{{family_name}}</div>{{/family_name}}
+      <div class="flex items-baseline justify-between mt-3">
+        {{#price}}<div class="text-lg font-bold text-indigo-300">{{price | rp}}</div>{{/price}}
+        {{#validity}}<div class="text-xs text-slate-400">⏱ {{validity}}</div>{{/validity}}
+      </div>
+    {{#has_href}}</a>{{/has_href}}{{^has_href}}</div>{{/has_href}}
+  {{/banners}}
+  </div>
+</section>
+{{/segments}}

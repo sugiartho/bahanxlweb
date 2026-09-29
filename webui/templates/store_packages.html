@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Store Packages · Webui-XL{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4 gap-3">
+  <h1 class="text-2xl font-bold"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg> Store Packages</h1>
+  <form method="get" class="text-sm">
+    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="enterprise" value="true" {% if enterprise %}checked{% endif %} onchange="this.form.submit()"> <span class="text-slate-300">Enterprise</span></label>
+  </form>
+</div>
+
+<form method="get" class="mb-4 flex gap-2">
+  {% if enterprise %}<input type="hidden" name="enterprise" value="true">{% endif %}
+  <input type="text" name="q" value="{{ q }}" placeholder="Cari nama paket atau family..." class="form-input flex-1">
+  <button class="btn btn-secondary" type="submit"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
+</form>
+
+<div class="text-xs text-slate-400 mb-3">{{ packages | length }} paket{% if q %} cocok dengan "{{ q }}"{% endif %}</div>
+
+{% if not packages %}
+<div class="card text-slate-400 text-sm">Tidak ada paket.</div>
+{% endif %}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+{% for p in packages %}
+{% if p.href %}
+<a href="{{ p.href }}" class="card group">
+{% else %}
+<div class="card opacity-70">
+{% endif %}
+  {% if p.family_name %}<div class="text-xs text-slate-400 truncate">{{ p.family_name }}</div>{% endif %}
+  <div class="font-bold mt-0.5 group-hover:text-indigo-300 line-clamp-2">{{ p.title }}</div>
+  <div class="flex items-baseline justify-between mt-3">
+    <div>
+      <div class="text-lg font-bold text-indigo-300">{{ p.price | rp }}</div>
+      {% if p.has_discount %}<div class="text-xs text-slate-500 line-through">{{ p.original_price | rp }}</div>{% endif %}
+    </div>
+    {% if p.validity %}<div class="text-xs text-slate-400">⏱ {{ p.validity }}</div>{% endif %}
+  </div>
+{% if p.href %}</a>{% else %}</div>{% endif %}
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+<div class="max-w-lg mx-auto">
+  <h1 class="text-2xl font-bold mb-1">Pengaturan Tema</h1>
+  <p class="text-sm text-slate-400 mb-6">Pilih tampilan yang lo suka</p>
+
+  {{#has_msg}}
+  <div class="alert-success text-emerald-400 theme-light:text-emerald-600 bg-emerald-500/10 border border-transparent theme-light:border-emerald-500/30 mb-4">{{msg}}</div>
+  {{/has_msg}}
+
+  <form action="/settings/theme" method="post" class="space-y-4" data-no-loader>
+    <div class="grid grid-cols-2 gap-4">
+      <label class="cursor-pointer group">
+        <input type="radio" name="theme" value="dark" class="hidden peer" {{#is_dark}}checked{{/is_dark}} onchange="this.form.submit()">
+        <div class="theme-card relative overflow-hidden transition-all !p-3 border-2 {{#is_dark}}border-indigo-500{{/is_dark}}{{^is_dark}}border-transparent{{/is_dark}}">
+          <div class="rounded-[14px] overflow-hidden mb-3">
+            <div class="bg-slate-900 p-2">
+              <div class="h-2 w-12 bg-slate-700 rounded mb-1"></div>
+              <div class="h-2 w-8 bg-slate-800 rounded"></div>
+            </div>
+            <div class="bg-[#0f172a] p-2 space-y-1">
+              <div class="h-2 w-full bg-slate-800 rounded"></div>
+              <div class="h-2 w-3/4 bg-slate-800 rounded"></div>
+              <div class="h-3 w-16 bg-indigo-600 rounded mt-2"></div>
+            </div>
+          </div>
+          <div class="font-semibold text-sm">Dark</div>
+          <div class="text-xs text-slate-400">Tema gelap (default)</div>
+        </div>
+      </label>
+
+      <label class="cursor-pointer group">
+        <input type="radio" name="theme" value="light" class="hidden peer" {{#is_light}}checked{{/is_light}} onchange="this.form.submit()">
+        <div class="theme-card relative overflow-hidden transition-all !p-3 border-2 {{#is_light}}border-indigo-500{{/is_light}}{{^is_light}}border-transparent{{/is_light}}">
+          <div class="rounded-[14px] overflow-hidden mb-3">
+            <div class="bg-white p-2">
+              <div class="h-2 w-12 bg-gray-200 rounded mb-1"></div>
+              <div class="h-2 w-8 bg-gray-100 rounded"></div>
+            </div>
+            <div class="bg-gray-50 p-2 space-y-1">
+              <div class="h-2 w-full bg-gray-200 rounded"></div>
+              <div class="h-2 w-3/4 bg-gray-200 rounded"></div>
+              <div class="h-3 w-16 bg-indigo-600 rounded mt-2"></div>
+            </div>
+          </div>
+          <div class="font-semibold text-sm">Light</div>
+          <div class="text-xs text-slate-400">Tema terang / clean</div>
+        </div>
+      </label>
+    </div>
+  </form>
+</div>

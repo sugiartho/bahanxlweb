@@ -1,0 +1,24 @@
+# Copy to .dev.vars for local `wrangler dev` (never commit .dev.vars)
+# Deploy button / production: set the same keys via `wrangler secret put <NAME>`
+
+# Session & storage
+SESSION_SECRET=generate-with-openssl-rand-hex-32
+STORAGE_ENCRYPTION_KEY=64-char-hex-or-32-byte-base64
+
+# MyXL API — get values from project channel / maintainer
+BASE_API_URL=
+BASE_CIAM_URL=
+BASIC_AUTH=
+UA=
+API_KEY=
+AES_KEY_ASCII=
+AX_FP_KEY=
+AX_FP=
+ENCRYPTED_FIELD_KEY=
+XDATA_KEY=
+AX_API_SIG_KEY=
+X_API_BASE_SECRET=
+
+# Telegram (optional)
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_WEBHOOK_SECRET=

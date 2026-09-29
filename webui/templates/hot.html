@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · Webui-XL{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold mb-4">{{ title }}</h1>
+{% if not packages %}
+<div class="card text-slate-400">Belum ada data hot package. Cek file <code>hot_data/{{ kind }}.json</code>.</div>
+{% else %}
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+{% for p in packages %}
+  {% if kind == "hot" %}
+  <a class="card" href="/packages/by-family?code={{ p.family_code }}">
+    <div class="font-semibold">{{ p.family_name }}</div>
+    <div class="text-sm text-slate-300">{{ p.variant_name }} · {{ p.option_name }}</div>
+    <div class="text-xs text-slate-500 mt-1">order {{ p.order }} {% if p.is_enterprise %}· enterprise{% endif %}</div>
+  </a>
+  {% else %}
+  <div class="card">
+    <div class="font-semibold">{{ p.name }}</div>
+    <div class="text-indigo-300 font-bold mt-1">{{ p.price | rp }}</div>
+    <div class="text-xs text-slate-400 mt-1">{{ p.detail }}</div>
+    {% if p.packages %}
+    <div class="mt-2 text-xs text-slate-500">{{ p.packages | length }} sub-package(s) — Hot-2 bundle. Buka detail untuk beli (gabungan payment).</div>
+    <form action="/purchase/hot2" method="post" class="mt-2">
+      <input type="hidden" name="hot2_idx" value="{{ loop.index0 }}">
+      <select name="method" class="form-input text-sm mb-2">
+        <option value="balance">Balance</option>
+        <option value="qris">QRIS</option>
+        <option value="ewallet_dana">DANA</option>
+        <option value="ewallet_shopeepay">ShopeePay</option>
+        <option value="ewallet_gopay">GoPay</option>
+        <option value="ewallet_ovo">OVO</option>
+      </select>
+      <button class="btn btn-primary text-sm w-full">Beli Bundle</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endif %}
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

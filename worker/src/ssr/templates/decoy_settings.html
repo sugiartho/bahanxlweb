@@ -1,0 +1,215 @@
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Pengaturan Decoy</h1>
+  <a href="/settings/decoy" class="text-xs text-slate-400 hover:text-slate-200">↻ Refresh</a>
+</div>
+
+{{#has_msg}}
+<div class="alert-success mb-4">{{msg}}</div>
+{{/has_msg}}
+
+<div class="card mb-6 bg-indigo-500/10 border-indigo-500/30">
+  <div class="text-sm text-indigo-200 leading-relaxed">
+    <p class="font-medium mb-2">Apa itu Decoy?</p>
+    <p class="text-slate-300">Decoy = paket dummy yang ditambahin bareng paket utama waktu beli biar transaksi keliatan "wajar". <b>Default</b> dipakai akun <span class="font-mono">PREPAID</span> biasa, <b>Prio</b> dipakai akun <span class="font-mono">PRIORITAS / PRIOHYBRID / GO</span>.</p>
+    <p class="text-amber-200 mt-2"><b>Penting:</b> Tekan tombol <b>Test Fetch</b> di tiap decoy buat verifikasi apakah masih valid sebelum dipakai.</p>
+  </div>
+</div>
+
+<h2 class="text-sm uppercase tracking-wider text-slate-400 mb-3">Decoy Bawaan</h2>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
+{{#builtins}}
+<details class="card">
+  <summary class="cursor-pointer flex items-start justify-between gap-3 list-none">
+    <div class="min-w-0">
+      <div class="font-bold text-sm">{{label}}</div>
+      <div class="text-xs text-slate-500 mt-0.5">{{subtype}}</div>
+      <div class="mt-2 text-xs text-slate-400 truncate">
+        {{#has_family_code}}<span class="font-mono">{{family_code_short}}</span> · order {{order}} · Rp {{price}}{{/has_family_code}}
+        {{^has_family_code}}<span class="text-red-400">kosong / belum di-set</span>{{/has_family_code}}
+      </div>
+    </div>
+    <div class="text-xs text-indigo-300 shrink-0">Edit ›</div>
+  </summary>
+  <div class="mt-4" data-editor="{{kind}}-{{key}}">
+    <div class="flex items-center gap-1 neu-tabs mb-3">
+      <button type="button" data-tab="form" data-target="tab-{{kind}}-{{key}}" class="tab-btn px-3 py-1.5 text-xs rounded-t border-b-2 border-indigo-500 text-indigo-300 -mb-px">Form</button>
+      <button type="button" data-tab="json" data-target="tab-{{kind}}-{{key}}" class="tab-btn px-3 py-1.5 text-xs rounded-t border-b-2 border-transparent text-slate-400 -mb-px">JSON</button>
+      <div class="ml-auto">
+        <button type="button" data-test="{{kind}}/{{key}}" data-test-target="test-{{kind}}-{{key}}" class="text-xs px-3 py-1.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" data-no-loader>Test Fetch</button>
+      </div>
+    </div>
+    <div id="test-{{kind}}-{{key}}" class="mb-3 hidden text-xs"></div>
+    <div data-pane="form" data-pane-of="tab-{{kind}}-{{key}}">
+      <form action="/settings/decoy/builtin/{{key}}" method="post" class="text-sm space-y-3">
+        <input class="form-input" name="family_name" value="{{family_name}}" placeholder="Family Name">
+        <input class="form-input font-mono" name="family_code" value="{{family_code}}" placeholder="Family Code" required>
+        <input class="form-input font-mono" name="variant_code" value="{{variant_code}}" placeholder="Variant Code" required>
+        <input class="form-input" name="variant_name" value="{{variant_name}}">
+        <input class="form-input" name="option_name" value="{{option_name}}">
+        <input class="form-input" type="number" name="order" value="{{order}}" min="1" required>
+        <input class="form-input" type="number" name="price" value="{{price}}" min="0" required>
+        <select class="form-input" name="migration_type">
+          <option value="NONE" {{#mt_NONE}}selected{{/mt_NONE}}>NONE</option>
+          <option value="PRE_TO_PRIOH" {{#mt_PRE_TO_PRIOH}}selected{{/mt_PRE_TO_PRIOH}}>PRE_TO_PRIOH</option>
+          <option value="PRIOH_TO_PRIO" {{#mt_PRIOH_TO_PRIO}}selected{{/mt_PRIOH_TO_PRIO}}>PRIOH_TO_PRIO</option>
+          <option value="PRIO_TO_PRIOH" {{#mt_PRIO_TO_PRIOH}}selected{{/mt_PRIO_TO_PRIOH}}>PRIO_TO_PRIOH</option>
+        </select>
+        <label class="flex items-center gap-2 text-sm text-slate-300">
+          <input type="checkbox" name="is_enterprise" value="true" {{#is_enterprise_checked}}checked{{/is_enterprise_checked}}> Enterprise
+        </label>
+        <button class="btn btn-primary w-full" type="submit">Simpan (Form)</button>
+      </form>
+    </div>
+    <div data-pane="json" data-pane-of="tab-{{kind}}-{{key}}" class="hidden">
+      <form action="/settings/decoy/raw/builtin/{{key}}" method="post">
+        <textarea name="raw_json" rows="14" class="form-input font-mono text-xs" spellcheck="false" required>{{raw_json}}</textarea>
+        <button class="btn btn-primary w-full mt-3" type="submit">Simpan (JSON)</button>
+      </form>
+    </div>
+  </div>
+</details>
+{{/builtins}}
+</div>
+
+<div class="flex items-center justify-between mb-3">
+  <h2 class="text-sm uppercase tracking-wider text-slate-400">Decoy Custom</h2>
+  <span class="text-xs text-slate-600">{{customs_count}} tersimpan</span>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
+{{#customs}}
+<details class="card border-fuchsia-500/30">
+  <summary class="cursor-pointer flex items-start justify-between gap-3 list-none">
+    <div class="min-w-0">
+      <div class="font-bold text-sm flex items-center gap-2">
+        <span class="text-fuchsia-300">{{name}}</span>
+        <span class="text-xs px-1.5 py-0.5 rounded {{base_method_qris_class}}">{{base_method}}</span>
+      </div>
+      <div class="mt-2 text-xs text-slate-400 truncate">
+        {{#has_family_code}}<span class="font-mono">{{family_code_short}}</span> · order {{order}} · Rp {{price}}{{/has_family_code}}
+        {{^has_family_code}}<span class="text-red-400">kosong</span>{{/has_family_code}}
+      </div>
+    </div>
+    <div class="text-xs text-indigo-300 shrink-0">Edit ›</div>
+  </summary>
+  <div class="mt-4">
+    <div class="flex items-center gap-1 neu-tabs mb-3">
+      <button type="button" data-tab="form" data-target="tab-custom-{{key}}" class="tab-btn px-3 py-1.5 text-xs rounded-t border-b-2 border-indigo-500 text-indigo-300 -mb-px">Form</button>
+      <button type="button" data-tab="json" data-target="tab-custom-{{key}}" class="tab-btn px-3 py-1.5 text-xs rounded-t border-b-2 border-transparent text-slate-400 -mb-px">JSON</button>
+      <div class="ml-auto">
+        <button type="button" data-test="custom/{{key}}" data-test-target="test-custom-{{key}}" class="text-xs px-3 py-1.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30" data-no-loader>Test Fetch</button>
+      </div>
+    </div>
+    <div id="test-custom-{{key}}" class="mb-3 hidden text-xs"></div>
+    <div data-pane="form" data-pane-of="tab-custom-{{key}}">
+      <form action="/settings/decoy/custom/{{key}}" method="post" class="text-sm space-y-3">
+        <input class="form-input" name="family_name" value="{{family_name}}">
+        <input class="form-input font-mono" name="family_code" value="{{family_code}}" required>
+        <input class="form-input font-mono" name="variant_code" value="{{variant_code}}" required>
+        <input class="form-input" name="variant_name" value="{{variant_name}}">
+        <input class="form-input" name="option_name" value="{{option_name}}">
+        <input class="form-input" type="number" name="order" value="{{order}}" min="1" required>
+        <input class="form-input" type="number" name="price" value="{{price}}" min="0" required>
+        <select class="form-input" name="migration_type">
+          <option value="NONE" {{#mt_NONE}}selected{{/mt_NONE}}>NONE</option>
+          <option value="PRE_TO_PRIOH" {{#mt_PRE_TO_PRIOH}}selected{{/mt_PRE_TO_PRIOH}}>PRE_TO_PRIOH</option>
+          <option value="PRIOH_TO_PRIO" {{#mt_PRIOH_TO_PRIO}}selected{{/mt_PRIOH_TO_PRIO}}>PRIOH_TO_PRIO</option>
+          <option value="PRIO_TO_PRIOH" {{#mt_PRIO_TO_PRIOH}}selected{{/mt_PRIO_TO_PRIOH}}>PRIO_TO_PRIOH</option>
+        </select>
+        <label class="flex items-center gap-2 text-sm text-slate-300">
+          <input type="checkbox" name="is_enterprise" value="true" {{#is_enterprise_checked}}checked{{/is_enterprise_checked}}> Enterprise
+        </label>
+        <select class="form-input" name="base_method">
+          <option value="balance" {{#base_method_balance_selected}}selected{{/base_method_balance_selected}}>Balance / Pulsa</option>
+          <option value="qris" {{#base_method_qris_selected}}selected{{/base_method_qris_selected}}>QRIS</option>
+        </select>
+        <button class="btn btn-primary w-full" type="submit">Simpan (Form)</button>
+      </form>
+    </div>
+    <div data-pane="json" data-pane-of="tab-custom-{{key}}" class="hidden">
+      <form action="/settings/decoy/raw/custom/{{key}}" method="post">
+        <textarea name="raw_json" rows="14" class="form-input font-mono text-xs" spellcheck="false" required>{{raw_json}}</textarea>
+        <button class="btn btn-primary w-full mt-3" type="submit">Simpan (JSON)</button>
+      </form>
+    </div>
+    <form action="/settings/decoy/custom/{{key}}/delete" method="post" class="mt-3"
+          data-confirm="Custom decoy bakal dihapus permanen."
+          data-confirm-title="Hapus custom decoy?"
+          data-confirm-variant="danger"
+          data-confirm-ok="Hapus">
+      <button class="btn btn-danger w-full text-xs" type="submit">Hapus Custom</button>
+    </form>
+  </div>
+</details>
+{{/customs}}
+</div>
+
+<details class="card border-dashed border-emerald-500/40">
+  <summary class="cursor-pointer text-sm font-medium text-emerald-300">+ Tambah Custom Decoy Baru</summary>
+  <form action="/settings/decoy/custom/add" method="post" class="mt-4 text-sm space-y-3">
+    <input class="form-input" name="name" pattern="[a-z0-9][a-z0-9_-]{0,30}" placeholder="v1, vtest, my-decoy" required>
+    <input class="form-input" name="family_name" placeholder="Family Name">
+    <input class="form-input font-mono" name="family_code" placeholder="Family Code" required>
+    <input class="form-input font-mono" name="variant_code" placeholder="Variant Code" required>
+    <input class="form-input" name="variant_name">
+    <input class="form-input" name="option_name">
+    <input class="form-input" type="number" name="order" value="1" min="1" required>
+    <input class="form-input" type="number" name="price" value="0" min="0" required>
+    <select class="form-input" name="migration_type">
+      <option value="NONE" selected>NONE</option>
+      <option value="PRE_TO_PRIOH">PRE_TO_PRIOH</option>
+      <option value="PRIOH_TO_PRIO">PRIOH_TO_PRIO</option>
+      <option value="PRIO_TO_PRIOH">PRIO_TO_PRIOH</option>
+    </select>
+    <select class="form-input" name="base_method">
+      <option value="balance" selected>Balance / Pulsa</option>
+      <option value="qris">QRIS</option>
+    </select>
+    <button class="btn btn-primary w-full" type="submit">+ Tambah Custom Decoy</button>
+  </form>
+</details>
+
+<script>
+(function(){
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.target, tab = btn.dataset.tab;
+      btn.parentElement.querySelectorAll('.tab-btn').forEach(b => {
+        const active = b === btn;
+        b.classList.toggle('border-indigo-500', active);
+        b.classList.toggle('text-indigo-300', active);
+        b.classList.toggle('border-transparent', !active);
+        b.classList.toggle('text-slate-400', !active);
+      });
+      const container = btn.closest('details') || document;
+      container.querySelectorAll('[data-pane-of="' + id + '"]').forEach(pane => {
+        pane.classList.toggle('hidden', pane.dataset.pane !== tab);
+      });
+    });
+  });
+
+  document.querySelectorAll('[data-test]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const path = btn.dataset.test;
+      const target = document.getElementById(btn.dataset.testTarget);
+      target.classList.remove('hidden');
+      target.innerHTML = '<div class="text-slate-400">⏳ Testing…</div>';
+      btn.disabled = true;
+      try {
+        const r = await fetch('/settings/decoy/test/' + path, {method: 'POST'});
+        const d = await r.json();
+        if (d.ok) {
+          target.innerHTML = '<div class="bg-emerald-500/10 border border-emerald-500/30 rounded p-2 text-emerald-200"><div class="font-bold">Fetch berhasil</div><div class="mt-1 text-xs">option: <span class="font-mono">' + escape(d.option_code) + '</span> · ' + escape(d.option_name || '-') + ' · Rp ' + (d.price || 0).toLocaleString('id-ID') + '</div></div>';
+        } else {
+          target.innerHTML = '<div class="bg-red-500/10 border border-red-500/30 rounded p-2 text-red-200">' + escape(d.error || 'unknown') + '</div>';
+        }
+      } catch (e) {
+        target.innerHTML = '<div class="bg-red-500/10 border border-red-500/30 rounded p-2 text-red-200">Network: ' + escape(String(e)) + '</div>';
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+  function escape(s){ const div=document.createElement('div'); div.textContent=s||''; return div.innerHTML; }
+})();
+</script>

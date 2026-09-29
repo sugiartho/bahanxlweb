@@ -1,0 +1,31 @@
+<div id="purchase-job-status" {{#job_pending}}hx-get="/internal/jobs/purchase/{{job_id}}" hx-trigger="every 2s" hx-swap="outerHTML"{{/job_pending}}>
+<h1 class="text-xl font-bold mb-4">{{title}}</h1>
+
+{{#job_pending}}
+<div class="card mb-4">
+  <div class="flex items-center gap-2 text-slate-300">
+    <span class="inline-block w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></span>
+    Memproses pembelian…
+  </div>
+</div>
+{{/job_pending}}
+
+{{#has_qris_img}}
+<div class="card mb-4 text-center">
+  <img src="{{qris_img}}" alt="QRIS" class="mx-auto bg-white p-2 rounded" style="max-width:320px">
+</div>
+{{/has_qris_img}}
+
+{{#result_success}}
+<div class="alert-success">Transaksi terkirim</div>
+{{/result_success}}
+{{^result_success}}
+{{#result}}
+<div class="alert-error">Transaksi tidak SUCCESS</div>
+{{/result}}
+{{/result_success}}
+
+<div class="card">
+  <pre class="text-[0.65rem] overflow-x-auto bg-[#0f172a] rounded-xl p-3 border border-slate-700/50 shadow-inner">{{result_json}}</pre>
+</div>
+</div>

@@ -1,0 +1,172 @@
+<div class="card mb-4 min-w-0 w-full">
+  <div class="flex items-start justify-between gap-3 min-w-0">
+    <div class="min-w-0 flex-1">
+      <div class="text-xs text-slate-400">{{fam_name}}{{#has_variant}} · {{variant_name}}{{/has_variant}}</div>
+      <h1 class="text-xl font-bold">{{opt_name}}</h1>
+      <div class="text-2xl font-bold text-indigo-300 mt-2">{{opt_price_rp}}</div>
+      <div class="text-sm text-slate-400 mt-1">Masa aktif: {{opt_validity}}</div>
+      {{#has_active_expiry}}<div class="text-sm text-slate-400 mt-1">Aktif s/d {{active_expiry_display}}</div>{{/has_active_expiry}}
+      {{#has_point}}<div class="text-sm text-slate-400">Point: {{opt_point}}</div>{{/has_point}}
+    </div>
+    <form action="/bookmark/add" method="post" class="shrink-0">
+      <input type="hidden" name="family_code" value="{{family_code}}">
+      <input type="hidden" name="family_name" value="{{fam_name}}">
+      <input type="hidden" name="is_enterprise" value="{{is_enterprise}}">
+      <input type="hidden" name="variant_name" value="{{variant_name}}">
+      <input type="hidden" name="option_name" value="{{opt_name}}">
+      <input type="hidden" name="order" value="{{opt_order}}">
+      <input type="hidden" name="package_option_code" value="{{option_code}}">
+      <button type="submit" class="btn btn-secondary" title="Bookmark">★</button>
+    </form>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 text-xs min-w-0 w-full">
+    <div class="code-field min-w-0">
+      <div class="text-slate-400 mb-1">Family code</div>
+      <div class="code-wrap break-all text-slate-200">{{family_code}}</div>
+    </div>
+    <div class="code-field min-w-0 w-full sm:col-span-2">
+      <div class="text-slate-400 mb-1">Option code</div>
+      <div class="code-wrap break-all text-slate-200">{{option_code}}</div>
+    </div>
+    <div class="code-field"><span class="text-slate-400">Payment for:</span> {{payment_for}}</div>
+    <div class="code-field"><span class="text-slate-400">Plan type:</span> {{plan_type}}</div>
+  </div>
+</div>
+
+{{#has_benefits}}
+<div class="card mb-4">
+  <h2 class="font-bold mb-2">Benefit</h2>
+  <ul class="space-y-2 text-sm">
+  {{#benefits}}
+    <li>
+      <div class="font-medium">{{name}}</div>
+      {{#has_total}}<div class="text-xs text-slate-400">{{total_disp}}{{#is_unlimited}} · Unlimited{{/is_unlimited}}</div>{{/has_total}}
+    </li>
+  {{/benefits}}
+  </ul>
+</div>
+{{/has_benefits}}
+
+{{#has_tnc}}
+<details class="card mb-4">
+  <summary class="font-bold cursor-pointer">Syarat & Ketentuan</summary>
+  <div class="mt-2 text-sm text-slate-300">{{{tnc_html}}}</div>
+</details>
+{{/has_tnc}}
+
+{{#is_redeem_voucher}}
+{{#has_tier_points}}
+<div class="card mb-4 text-sm">
+  <div class="text-slate-400">Saldo poin lo sekarang</div>
+  <div class="text-2xl font-bold text-amber-300">{{current_points_fmt}} Poin</div>
+  <p class="text-xs text-slate-500 mt-1">Paket ini butuh <b>{{opt_price_rp}}</b> untuk tukar poin (opsi <b>Tukar Poin</b> di bawah).</p>
+</div>
+{{/has_tier_points}}
+{{/is_redeem_voucher}}
+
+<div class="card">
+  <h2 class="font-bold mb-3">{{#is_redeem_voucher}}Tukar / Klaim{{/is_redeem_voucher}}{{^is_redeem_voucher}}Beli Paket{{/is_redeem_voucher}}</h2>
+  <form action="/purchase/{{option_code}}" method="post" class="space-y-3"
+        data-confirm="Paket <b>{{opt_name}}</b> seharga <span class='text-emerald-300 font-bold'>{{opt_price_rp}}</span> bakal dibeli. Pastiin metode pembayaran udah benar — pembelian nggak bisa dibatalkan setelah submit."
+        data-confirm-title="Konfirmasi Pembelian"
+        data-confirm-variant="pay"
+        data-confirm-ok="Bayar Sekarang">
+    <input type="hidden" name="payment_for" value="{{payment_for}}">
+    <input type="hidden" name="family_code" value="{{family_code}}">
+    <input type="hidden" name="variant_code" value="{{variant_code}}">
+    <input type="hidden" name="price" value="{{opt_price}}">
+    <input type="hidden" name="item_name" value="{{opt_name}}">
+    <div>
+      <label class="label">Metode</label>
+      <select class="form-input" name="method" required>
+        <optgroup label="Standar">
+          <option value="balance">Pulsa (Balance)</option>
+          <option value="qris">QRIS</option>
+          <option value="ewallet_dana">E-Wallet · DANA</option>
+          <option value="ewallet_shopeepay">E-Wallet · ShopeePay</option>
+          <option value="ewallet_gopay">E-Wallet · GoPay</option>
+          <option value="ewallet_ovo">E-Wallet · OVO</option>
+        </optgroup>
+        <optgroup label="Decoy bawaan">
+          <option value="decoy_balance">Pulsa + Decoy</option>
+          <option value="decoy_balance_v2">Pulsa + Decoy V2</option>
+          <option value="decoy_qris">QRIS + Decoy (+1K)</option>
+          <option value="decoy_qris0">QRIS + Decoy V2 (Rp0)</option>
+        </optgroup>
+        {{#has_custom_decoys}}
+        <optgroup label="Decoy custom">
+        {{#custom_decoys}}
+          <option value="decoy_custom_{{name}}">{{label}}</option>
+        {{/custom_decoys}}
+        </optgroup>
+        {{/has_custom_decoys}}
+        {{#is_redeem_voucher}}
+        <optgroup label="Tukar / Klaim (Poin &amp; Bonus)">
+          <option value="redeem_loyalty">Tukar Poin</option>
+          <option value="redeem_bounty">Klaim Bonus</option>
+          <option value="redeem_bounty_allotment">Kirim Bonus ke Nomor Lain</option>
+        </optgroup>
+        {{/is_redeem_voucher}}
+      </select>
+    </div>
+    <div id="bonus-dest" style="display:none">
+      <label class="label">Nomor Tujuan Bonus (62...)</label>
+      <input class="form-input" type="text" name="destination_msisdn" pattern="62\d{8,13}" placeholder="62812xxxxxxxx">
+      <p class="text-xs text-slate-500 mt-1">Untuk kirim bonus ke nomor XL lain — format internasional 62, bukan 08.</p>
+    </div>
+    <div id="wallet-num" style="display:none">
+      <label class="label">Nomor E-Wallet (08...)</label>
+      <input class="form-input" type="text" name="wallet_number" pattern="08\d{7,12}">
+    </div>
+    <div id="rewrite-price">
+      <label class="label">Rewrite Harga (opsional)</label>
+      <input class="form-input neu-input" type="number" name="overwrite_amount" min="0" placeholder="{{opt_price}}">
+      <p class="text-xs text-slate-500 mt-1">Kosong = harga asli ({{opt_price_rp}}). Isi angka baru untuk override total pembayaran — sama seperti opsi overwrite di CLI.</p>
+    </div>
+    <div id="qris-amount" style="display:none">
+      <label class="label">Override Amount (kosong = price + decoy price; trial-error)</label>
+      <input class="form-input" type="number" name="qris_amount" min="0" placeholder="(opsional)">
+      <p class="text-xs text-slate-500 mt-1">QRIS decoy butuh amount yang server terima (Bizz-err.Amount.Total). Coba angka di sekitar harga paket utama.</p>
+    </div>
+    <button class="btn btn-primary w-full" type="button" data-confirm-trigger>Bayar</button>
+  </form>
+  <script>
+    (function(){
+      var methodSel = document.querySelector('select[name=method]');
+      var walletInput = document.querySelector('input[name=wallet_number]');
+      var qrisInput = document.querySelector('input[name=qris_amount]');
+      var destInput = document.querySelector('input[name=destination_msisdn]');
+      var rewriteBox = document.getElementById('rewrite-price');
+      function syncMethodFields() {
+        var v = methodSel.value;
+        var sel = methodSel.options[methodSel.selectedIndex];
+        var label = sel.text || '';
+        var isRedeem = v.startsWith('redeem_');
+        if (rewriteBox) rewriteBox.style.display = isRedeem ? 'none' : 'block';
+        var needDest = v === 'redeem_bounty_allotment';
+        document.getElementById('bonus-dest').style.display = needDest ? 'block' : 'none';
+        if (destInput) {
+          destInput.disabled = !needDest;
+          destInput.required = needDest;
+          if (!needDest) destInput.value = '';
+        }
+        var needWallet = v.startsWith('ewallet');
+        document.getElementById('wallet-num').style.display = needWallet ? 'block' : 'none';
+        if (walletInput) {
+          walletInput.disabled = !needWallet;
+          walletInput.required = needWallet;
+          if (!needWallet) walletInput.value = '';
+        }
+        var isQrisDecoy = (v === 'decoy_qris' || v === 'decoy_qris0' ||
+                           (v.startsWith('decoy_custom_') && label.trim().startsWith('QRIS')));
+        document.getElementById('qris-amount').style.display = isQrisDecoy ? 'block' : 'none';
+        if (qrisInput) {
+          qrisInput.disabled = !isQrisDecoy;
+          if (!isQrisDecoy) qrisInput.value = '';
+        }
+      }
+      methodSel.addEventListener('change', syncMethodFields);
+      syncMethodFields();
+    })();
+  </script>
+</div>

@@ -1,0 +1,34 @@
+<h1 class="text-xl font-bold mb-4">{{title}}</h1>
+{{^has_packages}}
+<div class="card text-slate-400">Belum ada data hot package. Cek file <code>shared/{{kind}}.json</code>.</div>
+{{/has_packages}}
+{{#has_packages}}
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+{{#packages}}
+  {{#is_hot}}
+  <a class="card" href="/packages/by-family?code={{family_code}}">
+    <div class="font-semibold">{{family_name}}</div>
+    <div class="text-sm text-slate-300">{{variant_name}} · {{option_name}}</div>
+    <div class="text-xs text-slate-500 mt-1">order {{order}}</div>
+  </a>
+  {{/is_hot}}
+  {{#is_hot2}}
+  <div class="card">
+    <div class="font-semibold">{{name}}</div>
+    <div class="text-indigo-300 font-bold mt-1">{{price | rp}}</div>
+    <div class="text-xs text-slate-400 mt-1">{{detail}}</div>
+    {{#has_sub_packages}}
+    <form action="/purchase/hot2" method="post" class="mt-2">
+      <input type="hidden" name="hot2_idx" value="{{hot2_idx}}">
+      <select name="method" class="form-input text-sm mb-2">
+        <option value="balance">Balance</option>
+        <option value="qris">QRIS</option>
+      </select>
+      <button class="btn btn-primary text-sm w-full">Beli Bundle (PR-15)</button>
+    </form>
+    {{/has_sub_packages}}
+  </div>
+  {{/is_hot2}}
+{{/packages}}
+</div>
+{{/has_packages}}

@@ -1,0 +1,148 @@
+{
+  "secrets": {
+    "XDATA_KEY": "0123456789abcdef0123456789abcdef",
+    "AX_API_SIG_KEY": "0123456789abcdef0123456789abcdef",
+    "X_API_BASE_SECRET": "x-api-base-secret-test-value",
+    "ENCRYPTED_FIELD_KEY": "0123456789abcdef0123456789abcdef",
+    "AX_FP_KEY": "0123456789abcdef0123456789abcdef"
+  },
+  "cases": [
+    {
+      "name": "encrypt_xdata",
+      "input": {
+        "plaintext": "{\"hello\":\"world\",\"n\":42}",
+        "xtime_ms": 1710000000123
+      },
+      "output": "bt-7Knqb42pK72mkVuoJc9pUUinDiBeenacCbuHYX5c="
+    },
+    {
+      "name": "decrypt_xdata",
+      "input": {
+        "xdata": "bt-7Knqb42pK72mkVuoJc9pUUinDiBeenacCbuHYX5c=",
+        "xtime_ms": 1710000000123
+      },
+      "output": "{\"hello\":\"world\",\"n\":42}"
+    },
+    {
+      "name": "make_x_signature",
+      "input": {
+        "id_token": "id-token-sample",
+        "method": "POST",
+        "path": "api/v8/profile",
+        "sig_time_sec": 1710000000
+      },
+      "output": "f62ce4f8ae9e8c68cc23d264c07aba7c888623165c5de693d36280f6768fd09c5b8b937d62ba0cbe5ba2431bc42766b217cc45b400f9db46c7ee95b40e441910"
+    },
+    {
+      "name": "make_x_signature_payment",
+      "input": {
+        "access_token": "access-token",
+        "sig_time_sec": 1710000001,
+        "package_code": "PKG001",
+        "token_payment": "tok-pay",
+        "payment_method": "BALANCE",
+        "payment_for": "MYSELF",
+        "path": "api/v8/payment/settlement"
+      },
+      "output": "3872dbe58b947481f72bf82baa408ce57f6633979f602585de142eadb56f2eb6dffdd78f0ef075a14706ba91cbef69b5adc758936f2a67d04f778cb7e0d3da9a"
+    },
+    {
+      "name": "make_ax_api_signature",
+      "input": {
+        "ts_for_sign": "2026-06-13T10:00:00+07:00",
+        "contact": "6281234567890",
+        "code": "123456",
+        "contact_type": "SMS"
+      },
+      "output": "yZv+3FEAZln4Q90EnO46PFVDKl2wblFoKzPYmZinjDw="
+    },
+    {
+      "name": "make_x_signature_bounty",
+      "input": {
+        "access_token": "access-token",
+        "sig_time_sec": 1710000002,
+        "package_code": "BOUNTY1",
+        "token_payment": "tok-bounty"
+      },
+      "output": "51d419e39940c7976578535f5935494fff9f9d69f5bf923aa593841c23baa41e58dc6689aef71d4aabccd6a8ef86a6bb58f5d8fdca18900090cb208e875b3ddc"
+    },
+    {
+      "name": "make_x_signature_loyalty",
+      "input": {
+        "sig_time_sec": 1710000003,
+        "package_code": "LOYAL1",
+        "token_confirmation": "tok-confirm",
+        "path": "api/v8/loyalty/redeem"
+      },
+      "output": "6d4da8a2b0f6cd9570b09875503869521d714c422f26e3d4e522c6f159af9fad227a3ccf955f9d17c159b25d87b6e3de76aa6ace189c31e91968e5433a86ca45"
+    },
+    {
+      "name": "make_x_signature_bounty_allotment",
+      "input": {
+        "sig_time_sec": 1710000004,
+        "package_code": "ALLOT1",
+        "token_confirmation": "tok-allot",
+        "path": "api/v8/bounty/allotment",
+        "destination_msisdn": "6289988776655"
+      },
+      "output": "7089c2d18d8e148aaf08e903fbcade94403def896b202e3bc8a0c2ca173456d36792a1283d7205848120c46bc8c91a7fb4ef79c24b65923a8b2a8a67560a72e1"
+    },
+    {
+      "name": "make_x_signature_basic",
+      "input": {
+        "method": "GET",
+        "path": "api/v8/public",
+        "sig_time_sec": 1710000005
+      },
+      "output": "0a96803d36d4fcc6ec37c15c25ea8995ff1958e55b5a017842a711e0b93d48a0b089c4875a21d192b16924c974c2389eeb45f278e47898dbab6300c273f349ef"
+    },
+    {
+      "name": "encrypt_circle_msisdn",
+      "input": {
+        "msisdn": "6281234567890",
+        "iv_hex16": "aabbccddeeff0011"
+      },
+      "output": "Ao5c2swLYrZ2EDk-b35h8Q==aabbccddeeff0011"
+    },
+    {
+      "name": "decrypt_circle_msisdn",
+      "input": {
+        "encrypted": "Ao5c2swLYrZ2EDk-b35h8Q==aabbccddeeff0011"
+      },
+      "output": "6281234567890"
+    },
+    {
+      "name": "ax_fingerprint",
+      "input": {
+        "device": {
+          "manufacturer": "samsung",
+          "model": "SM-N935F",
+          "lang": "en",
+          "resolution": "720x1540",
+          "tz_short": "GMT07:00",
+          "ip": "192.169.69.69",
+          "font_scale": 1.0,
+          "android_release": "13",
+          "msisdn": "6281398370564"
+        }
+      },
+      "output": "C/nvVzoDyoLcZ25NVI1d6m9KrXVO2cdAd7/xZ2RqgxXfOj831mS5WmGS1PT60bru+2IaKB0Qbh9LOxgeEvjpeAwijfoghxmRpGCg1HG9HXs8K6fyskC4pT7/Vql9SxMy"
+    },
+    {
+      "name": "build_encrypted_field",
+      "input": {
+        "iv_hex16": "aabbccddeeff0011",
+        "urlsafe_b64": false
+      },
+      "output": "uVFmeeozG7AicWF803FxTw==aabbccddeeff0011"
+    },
+    {
+      "name": "build_encrypted_field_urlsafe",
+      "input": {
+        "iv_hex16": "aabbccddeeff0011",
+        "urlsafe_b64": true
+      },
+      "output": "uVFmeeozG7AicWF803FxTw==aabbccddeeff0011"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+<h1 class="text-xl font-bold mb-4">Notifikasi</h1>
+{{^has_items}}
+<div class="card text-slate-400">Tidak ada notifikasi.</div>
+{{/has_items}}
+<div class="space-y-2">
+{{#items}}
+<a class="card block {{#is_unread}}border-l-4 border-l-indigo-400{{/is_unread}}" href="/notifications/{{id}}">
+  <div class="font-medium text-slate-200">{{title}}{{#is_unread}} <span class="inline-block ml-1 w-2 h-2 rounded-full bg-indigo-500"></span>{{/is_unread}}</div>
+  <div class="text-sm text-slate-400 mt-1 leading-relaxed">{{body}}</div>
+  <div class="text-xs text-slate-500 mt-2">{{timestamp_iso}}</div>
+</a>
+{{/items}}
+</div>

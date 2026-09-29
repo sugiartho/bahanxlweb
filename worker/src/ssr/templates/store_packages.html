@@ -1,0 +1,29 @@
+<div class="flex items-center justify-between mb-4 gap-3">
+  <h1 class="text-2xl font-bold">Store Packages</h1>
+  <form method="get" class="text-sm">
+    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="enterprise" value="true" {{#enterprise}}checked{{/enterprise}} onchange="this.form.submit()"> <span class="text-slate-300">Enterprise</span></label>
+  </form>
+</div>
+<form method="get" class="mb-4 flex gap-2">
+  {{#enterprise}}<input type="hidden" name="enterprise" value="true">{{/enterprise}}
+  <input type="text" name="q" value="{{q}}" placeholder="Cari nama paket..." class="form-input flex-1">
+  <button class="btn btn-secondary" type="submit">Cari</button>
+</form>
+<div class="text-xs text-slate-400 mb-3">{{package_count}} paket{{#has_query}} cocok dengan "{{q}}"{{/has_query}}</div>
+{{^has_packages}}<div class="card text-slate-400 text-sm">Tidak ada paket.</div>{{/has_packages}}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+{{#packages}}
+{{#has_href}}<a href="{{href}}" class="card group">{{/has_href}}
+{{^has_href}}<div class="card opacity-70">{{/has_href}}
+  {{#family_name}}<div class="text-xs text-slate-400 truncate">{{family_name}}</div>{{/family_name}}
+  <div class="font-bold mt-0.5 group-hover:text-indigo-300 line-clamp-2">{{title}}</div>
+  <div class="flex items-baseline justify-between mt-3">
+    <div>
+      <div class="text-lg font-bold text-indigo-300">{{price | rp}}</div>
+      {{#has_discount}}<div class="text-xs text-slate-500 line-through">{{original_price | rp}}</div>{{/has_discount}}
+    </div>
+    {{#validity}}<div class="text-xs text-slate-400">⏱ {{validity}}</div>{{/validity}}
+  </div>
+{{#has_href}}</a>{{/has_href}}{{^has_href}}</div>{{/has_href}}
+{{/packages}}
+</div>

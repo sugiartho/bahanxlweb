@@ -1,0 +1,20 @@
+<div class="flex items-center justify-between mb-4 gap-3">
+  <h1 class="text-2xl font-bold">Store Families</h1>
+  <form method="get" class="text-sm">
+    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="enterprise" value="true" {{#enterprise}}checked{{/enterprise}} onchange="this.form.submit()"> <span class="text-slate-300">Enterprise</span></label>
+  </form>
+</div>
+<p class="text-sm text-slate-400 mb-4">Kategori paket. Klik buat lihat opsi dalam family.</p>
+{{^has_families}}<div class="card text-slate-400 text-sm">Tidak ada family.</div>{{/has_families}}
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+{{#families}}
+<a href="/packages/by-family?code={{id}}" class="card flex items-center gap-3 group">
+  {{#has_icon}}<img src="{{icon}}" alt="" class="w-10 h-10 rounded bg-slate-800 object-contain shrink-0">{{/has_icon}}
+  {{^has_icon}}<div class="w-10 h-10 rounded bg-slate-800 flex items-center justify-center shrink-0 text-slate-400"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>{{/has_icon}}
+  <div class="min-w-0">
+    <div class="font-medium group-hover:text-indigo-300 truncate">{{label}}</div>
+    <div class="text-xs text-slate-500 font-mono truncate">{{id}}</div>
+  </div>
+</a>
+{{/families}}
+</div>

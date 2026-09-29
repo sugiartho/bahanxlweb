@@ -1,0 +1,29 @@
+<h1 class="text-xl font-bold mb-4">Bookmark</h1>
+{{^has_bookmarks}}
+<div class="card text-slate-400 text-sm">Belum ada bookmark. Tambahin dari halaman detail paket.</div>
+{{/has_bookmarks}}
+<div class="space-y-2">
+{{#bookmarks}}
+<div class="card flex items-center justify-between gap-3">
+  <div class="min-w-0">
+    <div class="font-medium truncate">{{family_name}} · {{variant_name}}</div>
+    <div class="text-sm text-slate-300 truncate">{{option_name}} · order {{order}}</div>
+    <div class="text-xs text-slate-500 code-wrap">{{family_code}}</div>
+  </div>
+  <div class="flex gap-2 shrink-0">
+    <a class="btn btn-secondary" href="/packages/by-family?code={{family_code}}">Buka</a>
+    <form action="/bookmark/remove" method="post"
+          data-confirm="Bookmark bakal dihapus."
+          data-confirm-title="Hapus bookmark?"
+          data-confirm-variant="danger"
+          data-confirm-ok="Hapus">
+      <input type="hidden" name="family_code" value="{{family_code}}">
+      <input type="hidden" name="is_enterprise" value="{{is_enterprise}}">
+      <input type="hidden" name="variant_name" value="{{variant_name}}">
+      <input type="hidden" name="order" value="{{order}}">
+      <button class="btn btn-danger" type="submit">Hapus</button>
+    </form>
+  </div>
+</div>
+{{/bookmarks}}
+</div>

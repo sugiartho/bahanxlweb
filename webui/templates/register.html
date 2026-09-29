@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Register · Webui-XL{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto">
+  <div class="card">
+    <h1 class="text-xl font-bold mb-3"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Register (Dukcapil)</h1>
+    <form action="/register" method="post" class="space-y-3"
+          data-confirm="Registrasi MSISDN <span class='font-mono text-sky-300'>{field:msisdn}</span> akan diproses dengan NIK & KK yang lo masukin. Pastikan data sesuai dengan KTP — kalau salah berkali-kali nomor bisa kena suspend."
+          data-confirm-title="Konfirmasi Registrasi"
+          data-confirm-variant="warning"
+          data-confirm-ok="Daftarkan">
+      <div><label class="label">MSISDN (628xxx)</label><input class="form-input" name="msisdn" pattern="628\d{7,11}" value="{{ msisdn or '' }}" required></div>
+      <div><label class="label">NIK (16 digit)</label><input class="form-input" name="nik" pattern="\d{16}" required></div>
+      <div><label class="label">KK (16 digit)</label><input class="form-input" name="kk" pattern="\d{16}" required></div>
+      <button class="btn btn-primary w-full" type="submit">Submit</button>
+    </form>
+    <a href="/register/puk" class="block text-xs text-slate-400 hover:text-slate-200 mt-3">Validasi PUK →</a>
+  </div>
+  {% if res %}
+  <div class="card mt-3">
+    <pre class="text-xs overflow-x-auto bg-[#0f172a] rounded-xl p-2">{{ res | tojson(indent=2) }}</pre>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

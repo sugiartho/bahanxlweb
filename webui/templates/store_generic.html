@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · Webui-XL{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-bold">{{ title }}</h1>
+  <form method="get" class="flex items-center gap-2 text-sm">
+    <label class="flex items-center gap-1"><input type="checkbox" name="enterprise" value="true" {% if enterprise %}checked{% endif %} onchange="this.form.submit()"> Enterprise</label>
+  </form>
+</div>
+<div class="card">
+  <pre class="text-xs overflow-x-auto bg-[#0f172a] rounded-xl p-2">{{ res | tojson(indent=2) }}</pre>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id" class="{{theme_class}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{page_title}}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/custom.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cstyle%3E@media (prefers-color-scheme: dark) %7B polygon %7B stroke: %23818cf8; %7D %7D%3C/style%3E%3Cpolygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'%3E%3C/polygon%3E%3C/svg%3E">
+</head>
+<body class="bg-[#0f172a] text-slate-100 min-h-screen flex items-center justify-center p-4">
+<div class="max-w-md w-full">
+
+  <div class="text-center mb-6">
+    <div class="text-5xl mb-3 text-indigo-400"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
+    <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-300 via-purple-300 to-fuchsia-300 bg-clip-text text-transparent">Webui-XL</h1>
+    <p class="text-xs text-slate-500 mt-1">WebUI multi-user untuk MyXL</p>
+  </div>
+
+  <div class="neu-tabs flex gap-1 mb-4">
+    <a href="/u/login{{#username_qs}}?username={{username}}{{/username_qs}}"
+       class="flex-1 text-center px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-center gap-1.5 {{#is_login}}neu-tab-active{{/is_login}}{{^is_login}}text-slate-400 hover:text-white hover:bg-slate-800{{/is_login}}">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-indigo-400"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+      <span>Login</span>
+    </a>
+    <a href="/u/register"
+       class="flex-1 text-center px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-center gap-1.5 {{#is_register}}neu-tab-active{{/is_register}}{{^is_register}}text-slate-400 hover:text-white hover:bg-slate-800{{/is_register}}">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-400"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+      <span>Daftar baru</span>
+    </a>
+  </div>
+
+  {{#error}}<div class="alert-error">{{error}}</div>{{/error}}
+  {{#info}}<div class="alert-success">{{info}}</div>{{/info}}
+
+  <div class="card">
+    {{#is_register}}
+    <h2 class="text-lg font-bold mb-1">Daftar dengan Google</h2>
+    <p class="text-xs text-slate-400 mb-4">
+      Buat akun WebUI baru pakai Google. Setelah masuk, kamu bisa login nomor MyXL via OTP. Data tiap user ter-isolasi.
+    </p>
+    {{#google_enabled}}
+    <a href="{{google_auth_url}}" class="btn w-full flex items-center justify-center gap-2 bg-white text-slate-800 hover:bg-slate-100 border border-slate-300">
+      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.223 36 24 36c-5.522 0-10-4.478-10-10s4.478-10 10-10c2.84 0 5.404 1.207 7.207 3.143l5.657-5.657C33.64 10.053 29.082 8 24 8 12.955 8 4 16.955 4 28s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.108 18.961 13 24 13c2.84 0 5.404 1.207 7.207 3.143l5.657-5.657C33.64 10.053 29.082 8 24 8 16.318 8 9.656 13.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 48c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 39.091 26.715 40 24 40c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 43.556 16.227 48 24 48z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.022 35.026 44 31.762 44 28c0-1.341-.138-2.65-.389-3.917z"/></svg>
+      Daftar dengan Google
+    </a>
+    {{/google_enabled}}
+    {{^google_enabled}}
+    <div class="alert-warning text-sm">Google OAuth belum dikonfigurasi di server.</div>
+    {{/google_enabled}}
+    <p class="text-xs text-slate-500 text-center mt-4">
+      Udah punya akun? <a href="/u/login" class="text-indigo-300 hover:text-indigo-200">Login →</a>
+    </p>
+    {{/is_register}}
+    {{^is_register}}
+    <h2 class="text-lg font-bold mb-1">Login WebUI</h2>
+    <p class="text-xs text-slate-400 mb-4">
+      Masuk pakai Google atau username/password (akun lama).
+    </p>
+    {{#google_enabled}}
+    <a href="{{google_auth_url}}" class="btn w-full mb-4 flex items-center justify-center gap-2 bg-white text-slate-800 hover:bg-slate-100 border border-slate-300">
+      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.223 36 24 36c-5.522 0-10-4.478-10-10s4.478-10 10-10c2.84 0 5.404 1.207 7.207 3.143l5.657-5.657C33.64 10.053 29.082 8 24 8 12.955 8 4 16.955 4 28s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.108 18.961 13 24 13c2.84 0 5.404 1.207 7.207 3.143l5.657-5.657C33.64 10.053 29.082 8 24 8 16.318 8 9.656 13.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 48c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 39.091 26.715 40 24 40c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 43.556 16.227 48 24 48z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.022 35.026 44 31.762 44 28c0-1.341-.138-2.65-.389-3.917z"/></svg>
+      Masuk dengan Google
+    </a>
+    <div class="relative my-4">
+      <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-700"></div></div>
+      <div class="relative flex justify-center text-xs"><span class="bg-slate-900 px-2 text-slate-500">atau username/password</span></div>
+    </div>
+    {{/google_enabled}}
+    <form action="/u/login" method="post" class="space-y-3">
+      <input type="hidden" name="next" value="{{next}}">
+      <div>
+        <label class="label">Username</label>
+        <input class="form-input" type="text" name="username" value="{{username}}" required pattern="[a-z0-9][a-z0-9_-]{2,30}" autofocus>
+      </div>
+      <div>
+        <label class="label">Password</label>
+        <input class="form-input" type="password" name="password" required>
+      </div>
+      <button class="btn btn-primary w-full" type="submit">Masuk</button>
+    </form>
+    <p class="text-xs text-slate-500 text-center mt-4">
+      Belum punya? <a href="/u/register" class="text-emerald-300 hover:text-emerald-200">Daftar dengan Google →</a>
+    </p>
+    {{/is_register}}
+  </div>
+
+  <p class="text-center text-xs text-slate-600 mt-4">
+    {{users_count}} user terdaftar
+  </p>
+</div>
+</body>
+</html>

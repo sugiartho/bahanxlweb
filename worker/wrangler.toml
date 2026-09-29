@@ -1,0 +1,94 @@
+name = "webui-xl"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[rules]]
+type = "Text"
+globs = ["**/*.html"]
+fallthrough = true
+
+[assets]
+directory = "./static"
+binding = "ASSETS"
+
+[vars]
+ENVIRONMENT = "development"
+# Local dev: wrangler secret put SESSION_SECRET (or uses in-memory storage session key)
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[dev]
+port = 8787
+
+# ---------------------------------------------------------------------------
+# Staging — deploy: npx wrangler deploy --env staging
+# ---------------------------------------------------------------------------
+[env.staging]
+name = "webui-xl-staging"
+vars = { ENVIRONMENT = "staging" }
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "webui-xl-staging"
+database_id = "c6d9c50a-ec5d-4999-8c24-7c85d432dd62"
+migrations_dir = "migrations"
+
+[[env.staging.r2_buckets]]
+binding = "DATA"
+bucket_name = "webui-xl-staging-data"
+
+# [[env.staging.queues.producers]]
+# binding = "PURCHASE_QUEUE"
+# queue = "purchase-jobs-staging"
+
+# [[env.staging.queues.consumers]]
+# queue = "purchase-jobs-staging"
+# max_batch_size = 1
+# max_retries = 3
+
+# [[env.staging.durable_objects.bindings]]
+# name = "FAMILY_LOOP"
+# class_name = "FamilyLoopDO"
+
+# [[env.staging.migrations]]
+# tag = "v1"
+# new_classes = ["FamilyLoopDO"]
+
+# ---------------------------------------------------------------------------
+# Production — deploy: npx wrangler deploy --env production
+# ---------------------------------------------------------------------------
+[env.production]
+name = "webui-xl"
+vars = { ENVIRONMENT = "production" }
+
+# Uncomment and set your hostname after adding the domain in Cloudflare dashboard:
+# routes = [{ pattern = "webui.example.com", custom_domain = true }]
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "webui-xl"
+database_id = "b16350cf-1dc8-48ff-8a53-affb7346d7d6"
+migrations_dir = "migrations"
+
+[[env.production.r2_buckets]]
+binding = "DATA"
+bucket_name = "webui-xl-data"
+
+# [[env.production.queues.producers]]
+# binding = "PURCHASE_QUEUE"
+# queue = "purchase-jobs"
+
+# [[env.production.queues.consumers]]
+# queue = "purchase-jobs"
+# max_batch_size = 1
+# max_retries = 3
+
+# [[env.production.durable_objects.bindings]]
+# name = "FAMILY_LOOP"
+# class_name = "FamilyLoopDO"
+
+# [[env.production.migrations]]
+# tag = "v1"
+# new_classes = ["FamilyLoopDO"]

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Redemables · Webui-XL{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4 gap-3">
+  <h1 class="text-2xl font-bold"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg> Redemables</h1>
+  <form method="get" class="text-sm">
+    <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="enterprise" value="true" {% if enterprise %}checked{% endif %} onchange="this.form.submit()"> <span class="text-slate-300">Enterprise</span></label>
+  </form>
+</div>
+
+<p class="text-sm text-slate-400 mb-4">Reward, voucher, atau bonus yang bisa lo klaim/tukarkan.</p>
+
+{% if not categories %}
+<div class="card text-slate-400 text-sm">Belum ada redemable yang tersedia.</div>
+{% endif %}
+
+{% for cat in categories %}
+<section class="mb-6">
+  <h2 class="text-sm uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+    <span>{{ cat.name }}</span>
+    <span class="text-[10px] font-mono text-slate-600">{{ cat.code }}</span>
+  </h2>
+  {% if not cat.items %}
+  <div class="card text-slate-500 text-sm">Kosong</div>
+  {% else %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+  {% for r in cat.redeem_items %}
+    {% if r.href %}
+    <a href="{{ r.href }}" class="card group flex gap-3">
+    {% else %}
+    <div class="card opacity-70 flex gap-3">
+    {% endif %}
+      {% if r.icon %}
+      <img src="{{ r.icon }}" alt="" class="w-14 h-14 rounded bg-slate-800 object-contain shrink-0">
+      {% else %}
+      <div class="w-14 h-14 rounded bg-emerald-500/10 flex items-center justify-center text-2xl shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg></div>
+      {% endif %}
+      <div class="min-w-0 flex-1">
+        <div class="font-medium group-hover:text-emerald-300 line-clamp-2">{{ r.name }}</div>
+        {% if r.valid_until %}<div class="text-xs text-slate-500 mt-1">⏱ s/d {{ r.valid_until }}</div>{% endif %}
+        {% if r.action_type %}
+          {% if r.href %}
+          <span class="inline-block text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">{{ r.action_type }}</span>
+          {% else %}
+          <span class="inline-block text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">{{ r.action_type }} (tidak didukung)</span>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% if r.href %}</a>{% else %}</div>{% endif %}
+  {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endfor %}
+{% endblock %}

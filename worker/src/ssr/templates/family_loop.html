@@ -1,0 +1,29 @@
+<div class="max-w-md mx-auto">
+  <div class="card">
+    <h1 class="text-xl font-bold mb-3">Loop Beli Family</h1>
+    <p class="text-xs text-slate-400 mb-3">Beli berurutan semua opsi dalam satu family code. Pakai metode <b>balance</b>.</p>
+    <form action="/purchase/family-loop/start" method="post" class="space-y-3"
+          data-confirm="Loop bakal beli SEMUA opsi paket di family <span class='font-mono text-amber-300'>{field:family_code}</span> pakai metode <b>Pulsa</b>, mulai dari opsi #{field:start_from}. Pastiin saldo pulsa cukup banyak — tiap opsi yang sukses bakal dipotong dari saldo lo."
+          data-confirm-title="Loop Pembelian — Yakin?"
+          data-confirm-variant="warning"
+          data-confirm-ok="Mulai Loop">
+      <div>
+        <label class="label">Family Code</label>
+        <input class="form-input font-mono" type="text" name="family_code" value="{{family_code}}" required>
+      </div>
+      <div>
+        <label class="label">Mulai dari opsi ke-</label>
+        <input class="form-input" type="number" name="start_from" value="1" min="1">
+      </div>
+      <div>
+        <label class="label">Delay antar pembelian (detik)</label>
+        <input class="form-input" type="number" name="delay_seconds" value="0" min="0" max="60">
+      </div>
+      <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="use_decoy" value="true">
+        Pakai decoy
+      </label>
+      <button class="btn btn-primary w-full" type="submit">Mulai</button>
+    </form>
+  </div>
+</div>

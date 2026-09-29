@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Akrab · Webui-XL{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Akrab / Family Plan</h1>
+  <a href="/family-plan" class="text-xs text-slate-400 hover:text-slate-200">↻ Refresh</a>
+</div>
+
+{% if not has_plan %}
+<div class="card text-slate-300">
+  <div class="font-medium">Lo bukan organizer Akrab.</div>
+  <div class="text-xs text-slate-400 mt-1">Cek raw response di bawah kalau lo merasa harusnya ada.</div>
+  <details class="mt-3"><summary class="text-xs cursor-pointer text-slate-500">Raw response</summary>
+    <pre class="text-xs overflow-x-auto rounded-xl p-2 mt-1">{{ data | tojson(indent=2) }}</pre>
+  </details>
+</div>
+{% else %}
+
+<!-- Plan summary -->
+<div class="neu-box-lg p-6 mb-6">
+  <div class="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+  <div class="relative z-10">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <div class="text-xs text-emerald-100 uppercase tracking-wider">Plan</div>
+        <div class="text-2xl font-bold text-white">{{ info.plan_type }}</div>
+        <div class="text-xs text-emerald-100 mt-1">Organizer: <span class="font-mono">{{ info.parent_msisdn }}</span></div>
+      </div>
+      {% if info.end_date_ts %}
+      <div class="text-right">
+        <div class="text-xs text-emerald-100 uppercase tracking-wider">Aktif s/d</div>
+        <div class="font-bold text-white">{{ info.end_date_ts | date }}</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="mt-5">
+      <div class="flex items-baseline justify-between mb-1.5 text-sm">
+        <div class="text-emerald-100">Quota Bersama</div>
+        <div class="text-white font-mono">{{ info.remaining_quota | bytes }} <span class="text-emerald-100">/ {{ info.total_quota | bytes }}</span></div>
+      </div>
+      <div class="h-3 bg-emerald-900/40 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-emerald-300 to-cyan-300" style="width: {{ info.usage_pct }}%"></div>
+      </div>
+      <div class="text-xs text-emerald-100 mt-1">Terpakai {{ info.usage_pct }}%</div>
+    </div>
+  </div>
+</div>
+
+{# Slot card macro, reused for both regular & additional slots #}
+{% macro render_slot(m) %}
+<div class="card {% if m.is_empty %}border-dashed text-slate-400{% elif m.is_parent %}{% elif m.is_additional %}{% endif %}">
+  <div class="flex items-start justify-between gap-3">
+    <div class="min-w-0">
+      <div class="text-xs text-slate-500">
+        Slot #{{ m.idx }}{% if m.member_type %} · {{ m.member_type }}{% endif %}{% if m.is_additional %} · <span class="text-fuchsia-400">EXTRA</span>{% endif %}
+      </div>
+      {% if m.is_empty %}
+      <div class="font-medium text-slate-500 italic mt-1">⬜ Slot Kosong</div>
+      {% else %}
+      <div class="font-bold font-mono text-base mt-0.5">{{ m.msisdn }}</div>
+      {% if m.alias %}<div class="text-xs text-slate-400">{{ m.alias }}</div>{% endif %}
+      {% endif %}
+    </div>
+    {% if not m.is_empty and not m.is_parent %}
+    <div class="text-xs text-slate-500 text-right shrink-0">
+      {% if m.add_chances or m.total_add_chances %}
+      <div title="Add chances">+ {{ m.add_chances }}/{{ m.total_add_chances }}</div>
+      {% endif %}
+      {% if m.exp_ts %}<div>exp {{ m.exp_ts | date }}</div>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  {% if not m.is_empty and m.quota_allocated %}
+  <div class="mt-3">
+    <div class="flex items-baseline justify-between text-xs mb-1">
+      <span class="text-slate-400">Kuota</span>
+      <span class="font-mono text-slate-300">{{ m.quota_used | bytes }} / {{ m.quota_allocated | bytes }}</span>
+    </div>
+    <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+      <div class="h-full {% if m.quota_pct > 85 %}bg-red-500{% elif m.quota_pct > 60 %}bg-amber-500{% else %}bg-indigo-500{% endif %}" style="width: {{ m.quota_pct }}%"></div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="mt-3 pt-3">
+    {% if m.is_empty %}
+    <details>
+      <summary class="cursor-pointer text-sm text-emerald-300 hover:text-emerald-200">+ Tambah member</summary>
+      <form action="/family-plan/change-member" method="post" class="mt-3 space-y-2 text-sm"
+            data-confirm="MSISDN <span class='font-mono text-emerald-300'>{field:new_msisdn}</span> bakal ditambahin ke slot #{{ m.idx }} sebagai <b>{field:alias}</b>. Slot ini sebelumnya kosong."
+            data-confirm-title="Tambah member ke Akrab?"
+            data-confirm-variant="primary"
+            data-confirm-ok="Tambah">
+        <input type="hidden" name="slot_id" value="{{ m.slot_id }}">
+        <input type="hidden" name="family_member_id" value="{{ m.family_member_id }}">
+        <div><label class="label">MSISDN baru (628xxx)</label><input class="form-input" name="new_msisdn" pattern="628\d{7,11}" required></div>
+        <div><label class="label">Alias kamu (parent)</label><input class="form-input" name="parent_alias" required></div>
+        <div><label class="label">Alias member baru</label><input class="form-input" name="alias" required></div>
+        <button class="btn btn-primary w-full" type="submit">Tambah ke Slot {{ m.idx }}</button>
+      </form>
+    </details>
+    {% elif not m.is_parent %}
+    <div class="flex flex-wrap gap-2">
+      <details class="flex-1 min-w-0">
+        <summary class="cursor-pointer text-xs text-sky-300 hover:text-sky-200"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Set quota</summary>
+        <form action="/family-plan/set-quota" method="post" class="mt-2 space-y-2 text-xs"
+              data-confirm="Set kuota slot #{{ m.idx }} ({{ m.msisdn }}) ke <b>{field:new_allocation_mb} MB</b>. Allocation sebelumnya: {{ (m.quota_allocated / (1024*1024)) | round | int }} MB."
+              data-confirm-title="Set quota member?"
+              data-confirm-variant="primary"
+              data-confirm-ok="Set">
+          <input type="hidden" name="family_member_id" value="{{ m.family_member_id }}">
+          <input type="hidden" name="original_allocation" value="{{ m.quota_allocated }}">
+          <input class="form-input" type="number" name="new_allocation_mb" placeholder="Quota baru (MB)" min="0" required>
+          <button class="btn btn-secondary w-full text-xs" type="submit">Set Quota</button>
+        </form>
+      </details>
+      <form action="/family-plan/remove-member" method="post"
+            data-confirm="Member <span class='font-mono text-red-300'>{{ m.msisdn }}</span> bakal dikeluarin dari slot #{{ m.idx }}. Quota allocation-nya juga ke-reset."
+            data-confirm-title="Hapus member Akrab?"
+            data-confirm-variant="danger"
+            data-confirm-ok="Hapus">
+        <input type="hidden" name="family_member_id" value="{{ m.family_member_id }}">
+        <button class="btn btn-danger text-xs" type="submit">Hapus</button>
+      </form>
+    </div>
+    {% else %}
+    <div class="text-xs text-amber-400"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 text-amber-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Parent (organizer) — tidak bisa diubah</div>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+<!-- Regular Slots -->
+<h2 class="text-sm uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
+  <span>Slot Reguler ({{ members | rejectattr('is_empty') | list | length }}/{{ members | length }} terisi)</span>
+  {% if info.total_regular_slot %}<span class="text-[10px] text-slate-600">total: {{ info.total_regular_slot }}</span>{% endif %}
+</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+  {% for m in members %}{{ render_slot(m) }}{% endfor %}
+</div>
+
+<!-- Additional / Paid Slots -->
+{% if additional %}
+<h2 class="text-sm uppercase tracking-wider text-fuchsia-400 mb-3 flex items-center justify-between">
+  <span>Slot Tambahan (Berbayar) — {{ additional | rejectattr('is_empty') | list | length }}/{{ additional | length }}</span>
+  {% if info.total_paid_slot %}<span class="text-[10px] text-slate-600">total: {{ info.total_paid_slot }}</span>{% endif %}
+</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+  {% for m in additional %}{{ render_slot(m) }}{% endfor %}
+</div>
+{% endif %}
+
+<details class="card">
+  <summary class="cursor-pointer text-sm text-slate-400">Raw response (debug)</summary>
+  <pre class="text-xs overflow-x-auto rounded-xl p-2 mt-2">{{ data | tojson(indent=2) }}</pre>
+</details>
+
+{% endif %}
+{% endblock %}

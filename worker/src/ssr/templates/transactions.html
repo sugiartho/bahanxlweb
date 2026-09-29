@@ -1,0 +1,90 @@
+<div class="flex items-center justify-between mb-6 gap-3">
+  <h1 class="text-xl font-bold text-white theme-light:text-slate-900 flex items-center gap-2 shrink-0">
+    <span class="neu-header-icon text-indigo-400 shrink-0">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+    </span>
+    Riwayat Transaksi
+  </h1>
+  <a href="/transactions" class="btn btn-secondary text-xs inline-flex items-center gap-1.5 shrink-0">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+    Refresh
+  </a>
+</div>
+
+{{^has_items}}
+<div class="card text-slate-400">
+  <div class="font-medium text-slate-200 theme-light:text-slate-700">Belum ada transaksi tercatat.</div>
+  <div class="text-xs text-slate-500 mt-1">Atau response API tidak sesuai format.</div>
+  <details class="mt-4">
+    <summary class="text-xs cursor-pointer text-slate-500 hover:text-slate-300 neu-pill inline-flex px-3 py-1">Raw response</summary>
+    <pre class="text-xs overflow-x-auto neu-inset-card rounded-xl p-3 mt-2">{{raw_json}}</pre>
+  </details>
+</div>
+{{/has_items}}
+
+{{#has_items}}
+<div class="neu-pill inline-flex text-xs text-slate-400 px-3 py-1.5 mb-4">{{items_count}} transaksi</div>
+<div class="space-y-4">
+{{#items}}
+<div class="card">
+  <div class="flex gap-4">
+    <div class="w-14 h-14 rounded-2xl neu-box-sm flex items-center justify-center shrink-0 overflow-hidden">
+      {{#has_icon}}
+      <img src="{{icon_data_uri}}" alt="" class="w-full h-full object-cover">
+      {{/has_icon}}
+      {{^has_icon}}
+      <span class="text-slate-400">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+      </span>
+      {{/has_icon}}
+    </div>
+    <div class="min-w-0 flex-1">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <div class="font-bold leading-snug line-clamp-2 text-slate-100 theme-light:text-slate-800">{{title}}</div>
+          {{#validity}}
+          <div class="text-xs text-slate-400 mt-1 flex items-center gap-1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 opacity-70" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            {{validity}}
+          </div>
+          {{/validity}}
+          {{#target}}
+          <div class="text-xs text-slate-500 mt-0.5">untuk <span class="font-mono text-slate-400">{{target}}</span></div>
+          {{/target}}
+        </div>
+        <div class="neu-box-sm px-3 py-1.5 rounded-xl shrink-0 text-right">
+          <div class="font-bold text-indigo-300 text-sm whitespace-nowrap">{{price}}</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 mt-3">
+        <span class="neu-pill text-xs px-3 py-1 {{status_text_class}}">{{status}}</span>
+        {{#show_payment_status}}
+        <span class="neu-pill text-xs px-3 py-1 {{payment_status_text_class}}">bayar: {{payment_status}}</span>
+        {{/show_payment_status}}
+        <span class="neu-pill text-xs px-3 py-1 text-slate-300 flex items-center gap-1.5">
+          {{#pm_icon_data_uri}}<img src="{{pm_icon_data_uri}}" alt="" class="w-3.5 h-3.5 rounded">{{/pm_icon_data_uri}}
+          {{payment_method}}
+        </span>
+        {{#dt}}
+        <span class="neu-pill text-xs px-3 py-1 text-slate-500 flex items-center gap-1.5">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 opacity-70" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          {{dt}}
+        </span>
+        {{/dt}}
+      </div>
+      {{#trx_code}}
+      <div class="mt-3 neu-inset-card rounded-xl px-3 py-2">
+        <div class="text-[10px] text-slate-500 font-mono truncate">trx: {{trx_code}}</div>
+      </div>
+      {{/trx_code}}
+    </div>
+  </div>
+</div>
+{{/items}}
+</div>
+
+<details class="mt-6">
+  <summary class="text-xs cursor-pointer text-slate-500 hover:text-slate-300 neu-pill inline-flex px-3 py-1">Raw response (debug)</summary>
+  <pre class="text-xs overflow-x-auto neu-inset-card rounded-xl p-3 mt-2">{{raw_json}}</pre>
+</details>
+{{/has_items}}

@@ -1,0 +1,10 @@
+<div class="card max-w-3xl mx-auto p-6">
+  <h1 class="text-2xl font-bold text-red-400 mb-2">{{title}}</h1>
+  {{#message_pre}}
+  <pre class="text-xs text-slate-300 whitespace-pre-wrap rounded-xl p-3 overflow-auto max-h-[60vh]">{{message}}</pre>
+  {{/message_pre}}
+  {{^message_pre}}
+  <p class="text-slate-300">{{message}}</p>
+  {{/message_pre}}
+  <a href="/" class="btn btn-secondary mt-4">Kembali</a>
+</div>

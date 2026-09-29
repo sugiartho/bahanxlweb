@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="id" class="{{theme_class}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{page_title}}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/custom.css?v=17">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cstyle%3E@media (prefers-color-scheme: dark) %7B polygon %7B stroke: %23818cf8; %7D %7D%3C/style%3E%3Cpolygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'%3E%3C/polygon%3E%3C/svg%3E">
+  <script>
+    tailwind.config = { theme: { extend: {
+      colors: { brand: { 50:'#eef2ff',400:'#818cf8',500:'#6366f1',600:'#4f46e5',700:'#4338ca'}}
+    } } }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+
+  <script>
+    function toggleMsisdn() {
+      const span = document.getElementById('msisdn-text');
+      const hidden = document.getElementById('msisdn-full');
+      if (!span || !hidden) return;
+      if (span.textContent === '••••••••••') {
+        span.textContent = hidden.value;
+      } else {
+        span.textContent = '••••••••••';
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen antialiased overflow-x-hidden">
+
+<!-- GLOBAL LOADER -->
+<div id="page-loader" class="page-loader fixed inset-0 z-50 flex items-center justify-center pointer-events-none" style="opacity:0; transition: opacity 150ms ease;">
+  <div class="page-loader__backdrop absolute inset-0 bg-[#0f172a]/88 backdrop-blur-md"></div>
+  <div class="page-loader__panel relative flex flex-col items-center gap-5 px-8 py-7 text-center max-w-sm mx-4">
+    <div class="page-loader__spinner relative w-20 h-20">
+      <div class="page-loader__ring page-loader__ring--outer absolute inset-0 rounded-full"></div>
+      <div class="page-loader__ring page-loader__ring--spin absolute inset-1 rounded-full"></div>
+      <div class="page-loader__ring page-loader__ring--pulse absolute inset-3 rounded-full"></div>
+      <div class="page-loader__icon absolute inset-0 flex items-center justify-center text-2xl text-indigo-400" id="page-loader-icon">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+      </div>
+    </div>
+    <div class="w-full space-y-2">
+      <div id="page-loader-msg" class="text-sm font-medium text-slate-200">Memuat…</div>
+      <div id="page-loader-sub" class="text-xs text-slate-500">Tunggu sebentar ya cuy</div>
+      <div id="page-loader-bar" class="page-loader__bar hidden" aria-hidden="true">
+        <div class="page-loader__bar-fill"></div>
+      </div>
+      <div id="page-loader-dots" class="page-loader__dots hidden" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div id="confirm-modal" class="confirm-modal fixed inset-0 z-[60] flex items-center justify-center pointer-events-none" style="opacity:0; transition: opacity 150ms ease;">
+  <div id="confirm-backdrop" class="absolute inset-0 bg-[#0f172a]/70 backdrop-blur-sm"></div>
+  <div id="confirm-panel" class="confirm-modal__panel relative w-[calc(100%-2rem)] max-w-md transition-transform duration-150 ease-out">
+    <div class="p-5 sm:p-6">
+      <div class="flex items-start gap-3">
+        <div id="confirm-icon" class="w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-amber-500/15 text-amber-300 border border-amber-500/30">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 id="confirm-title" class="font-bold text-base sm:text-lg text-slate-100 leading-snug">Konfirmasi</h3>
+          <div id="confirm-message" class="text-sm text-slate-300 mt-1 leading-relaxed">Yakin mau lanjut?</div>
+        </div>
+      </div>
+      <div id="confirm-detail-wrap" class="mt-4 hidden">
+        <div id="confirm-detail" class="text-xs text-slate-400 bg-[#0f172a] border border-slate-800 rounded-xl p-3 font-mono break-all"></div>
+      </div>
+      <div class="flex gap-2 mt-5 justify-end">
+        <button type="button" id="confirm-cancel" class="btn btn-secondary text-sm px-4">Batal</button>
+        <button type="button" id="confirm-ok" class="btn btn-primary text-sm px-4">Lanjut</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<header class="neu-box-sm backdrop-blur sticky top-0 z-30 mx-2 mt-2">
+  <div class="flex items-center justify-between px-4 h-14 lg:pl-72">
+    <div class="flex items-center gap-3">
+      <button id="nav-toggle" class="neu-header-icon lg:hidden text-slate-300 hover:text-white" aria-label="menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <a href="/" class="flex items-center gap-1.5 font-bold text-lg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span class="bg-gradient-to-r from-indigo-400 to-fuchsia-400 bg-clip-text text-transparent">WebUI-XL</span></a>
+    </div>
+    <div class="flex items-center gap-2 text-sm ml-auto mr-0">
+      {{#active_user}}<input type="hidden" id="msisdn-full" value="{{number}}">{{/active_user}}
+      {{#webui_user}}
+      <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full neu-box-sm text-slate-200 theme-light:text-slate-700 font-bold border border-transparent shrink-0">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 theme-light:text-slate-500"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span class="text-xs">{{username}}</span>
+      </div>
+        <a href="/u/logout" class="neu-header-icon neu-header-icon-round text-xs text-slate-400 hover:text-red-300 shrink-0" title="Logout WebUI" data-confirm="Yakin mau logout? Sesi lu bakal dihapus." data-confirm-variant="danger" data-confirm-ok="Logout"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg></a>
+      {{/webui_user}}{{^webui_user}}<a href="/u/login" class="btn btn-primary text-xs">Login</a>
+      {{/webui_user}}</div></div></header>
+
+<!-- SIDEBAR (desktop) + DRAWER (mobile) -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-[#0f172a] z-40 transform -translate-x-full lg:translate-x-0 transition-transform flex flex-col border-r border-slate-800/30" style="box-shadow: 4px 0 20px rgba(6,10,18,0.5);">
+  <div class="p-4 hidden lg:block shrink-0">
+    <div class="flex items-center gap-1.5 font-bold text-lg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span class="bg-gradient-to-r from-indigo-400 to-fuchsia-400 bg-clip-text text-transparent">WebUI-XL</span></div>
+    <div class="text-xs text-slate-500">myXL CLI · WebUI</div>
+  </div>
+  <nav class="p-3 space-y-1 flex-1 overflow-y-auto" id="sidebar-nav">
+        {{#sections}}
+      {{#is_group}}
+        <div class="neu-sidebar-dropdown{{#open}} open{{/open}}" data-group="{{group}}">
+          <span>{{group}}</span>
+          <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="neu-sidebar-children{{#open}} open{{/open}}">
+          {{#items}}
+            <a href="{{href}}" class="neu-sidebar-link{{#active}} active{{/active}}">{{{label}}}</a>
+          {{/items}}
+        </div>
+      {{/is_group}}
+      {{^is_group}}
+        <a href="{{href}}" class="neu-sidebar-link{{#active}} active{{/active}}"><span class="neu-sidebar-icon">{{{icon}}}</span> <span>{{label}}</span></a>
+      {{/is_group}}
+    {{/sections}}
+  </nav>
+  <div class="mt-auto p-4 text-xs text-slate-600 space-y-3">
+    {{#webui_user}}
+      <a href="/donasi" class="btn btn-secondary w-full flex items-center justify-center gap-2 !text-emerald-400 theme-light:!text-emerald-600 mb-2">
+        <i class="fa-solid fa-mug-hot"></i> Dukung Developer
+      </a>
+      <a href="/u/logout" class="btn btn-secondary w-full flex items-center justify-center gap-2 !text-red-400 theme-light:!text-red-500" data-confirm="Yakin mau logout dari WebUI-XL?" data-confirm-ok="Logout" data-confirm-variant="danger">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg> Logout
+      </a>
+    {{/webui_user}}<div class="text-center pt-2 border-t border-slate-800/30 theme-light:border-slate-200">
+      <div>v1.0 · CF Worker</div>
+      <div class="mt-1"><a href="https://github.com/arifianilhamnrr/me-cli-sunset" class="hover:text-slate-400" target="_blank">repo upstream ↗</a></div>
+    </div>
+  </div>
+</aside>
+
+<!-- Backdrop -->
+<div id="nav-backdrop" class="lg:hidden fixed inset-0 bg-black/50 z-30 hidden"></div>
+
+<!-- MAIN -->
+<main class="lg:pl-64 pb-20 lg:pb-8 min-w-0 max-w-full overflow-x-clip">
+  <div class="px-4 py-6 max-w-5xl mx-auto min-w-0 w-full">
+    {{{content}}}
+  </div>
+</main>
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="lg:hidden fixed bottom-0 inset-x-0 z-30 neu-box-sm mx-2 mb-2">
+  <div class="grid grid-cols-5 text-xs">
+    <a href="/packages/my" class="flex flex-col items-center py-3 {{#bottom_packages}}text-indigo-300{{/bottom_packages}}{{^bottom_packages}}text-slate-400{{/bottom_packages}}"><span class="neu-bottom-icon {{#bottom_packages}}active{{/bottom_packages}}"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></span>Paket</a>
+    <a href="/hot" class="flex flex-col items-center py-3 {{#bottom_hot}}text-indigo-300{{/bottom_hot}}{{^bottom_hot}}text-slate-400{{/bottom_hot}}"><span class="neu-bottom-icon {{#bottom_hot}}active{{/bottom_hot}}"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg></span>Hot</a>
+    <a href="/" class="flex flex-col items-center py-3 {{#bottom_home}}text-indigo-300{{/bottom_home}}{{^bottom_home}}text-slate-400{{/bottom_home}}"><span class="neu-bottom-icon {{#bottom_home}}active{{/bottom_home}}"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>Home</a>
+    <a href="/transactions" class="flex flex-col items-center py-3 {{#bottom_transactions}}text-indigo-300{{/bottom_transactions}}{{^bottom_transactions}}text-slate-400{{/bottom_transactions}}"><span class="neu-bottom-icon {{#bottom_transactions}}active{{/bottom_transactions}}"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span>Riwayat</a>
+    <a href="/u/account" class="flex flex-col items-center py-3 {{#bottom_account}}text-indigo-300{{/bottom_account}}{{^bottom_account}}text-slate-400{{/bottom_account}}"><span class="neu-bottom-icon {{#bottom_account}}active{{/bottom_account}}"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>Akun</a>
+  </div>
+</nav>
+
+<script>
+(function(){
+  const sb = document.getElementById('sidebar'),
+        bd = document.getElementById('nav-backdrop'),
+        bt = document.getElementById('nav-toggle');
+  function open(){ sb.classList.remove('-translate-x-full'); bd.classList.remove('hidden'); initDropdowns(); }
+  function close(){ sb.classList.add('-translate-x-full'); bd.classList.add('hidden'); }
+  bt && bt.addEventListener('click', open);
+  bd && bd.addEventListener('click', close);
+
+  // Sidebar dropdown toggle
+  function initDropdowns() {
+    const dropdowns = document.querySelectorAll('.neu-sidebar-dropdown');
+    dropdowns.forEach(dd => {
+      if (dd.dataset.init) return;
+      dd.dataset.init = '1';
+      dd.addEventListener('click', () => {
+        const children = dd.nextElementSibling;
+        const isOpen = dd.classList.contains('open');
+        
+        // Close all others (optional: accordion mode)
+        dropdowns.forEach(other => {
+          if (other !== dd) {
+            other.classList.remove('open');
+            other.nextElementSibling.classList.remove('open');
+          }
+        });
+
+        if (isOpen) {
+          dd.classList.remove('open');
+          children.classList.remove('open');
+        } else {
+          dd.classList.add('open');
+          children.classList.add('open');
+          // Scroll into view on mobile
+          setTimeout(() => {
+            dd.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 100);
+        }
+      });
+    });
+  }
+
+  // Auto-open dropdown if current path matches a child
+  const activeLinks = document.querySelectorAll('.neu-sidebar-link.active');
+  activeLinks.forEach(link => {
+    const parent = link.closest('.neu-sidebar-children');
+    if (parent) {
+      parent.classList.add('open');
+      const dropdown = parent.previousElementSibling;
+      if (dropdown && dropdown.classList.contains('neu-sidebar-dropdown')) {
+        dropdown.classList.add('open');
+      }
+    }
+  });
+
+  initDropdowns();
+})();
+
+// form.method is shadowed when <input name="method"> exists (e.g. payment method).
+function formHttpMethod(form) {
+  return (form.getAttribute('method') || 'get').toUpperCase();
+}
+
+// ===== Confirm Modal =====
+// Use by adding `data-confirm="Yakin mau lanjut?"` on a <form> or <a>.
+// Optional attrs: data-confirm-title, data-confirm-ok (button text),
+//                 data-confirm-detail (extra mono text), data-confirm-variant ("danger"/"warning"/"primary").
+(function(){
+  const modal = document.getElementById('confirm-modal');
+  if (!modal) return;
+  const backdrop = document.getElementById('confirm-backdrop'),
+        panel = document.getElementById('confirm-panel'),
+        iconEl = document.getElementById('confirm-icon'),
+        titleEl = document.getElementById('confirm-title'),
+        msgEl = document.getElementById('confirm-message'),
+        detailWrap = document.getElementById('confirm-detail-wrap'),
+        detailEl = document.getElementById('confirm-detail'),
+        okBtn = document.getElementById('confirm-ok'),
+        cancelBtn = document.getElementById('confirm-cancel');
+  let pending = null;
+  const VARIANTS = {
+    danger:  { icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>', iconCls:'bg-red-500/15 text-red-300 border-red-500/30',         okCls:'btn-danger',   okText:'Hapus' },
+    warning: { icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>', iconCls:'bg-amber-500/15 text-amber-300 border-amber-500/30',   okCls:'btn-primary',  okText:'Lanjut' },
+    primary: { icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block text-emerald-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>', iconCls:'bg-indigo-500/15 text-indigo-300 border-indigo-500/30', okCls:'btn-primary', okText:'Lanjut' },
+    pay:     { icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>', iconCls:'bg-emerald-500/15 text-emerald-300 border-emerald-500/30', okCls:'btn-primary', okText:'Bayar' },
+    otp:     { icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>', iconCls:'bg-sky-500/15 text-sky-300 border-sky-500/30',         okCls:'btn-primary',  okText:'Kirim OTP' },
+  };
+  function applyVariant(v) {
+    const cfg = VARIANTS[v] || VARIANTS.warning;
+    iconEl.className = 'w-11 h-11 rounded-full flex items-center justify-center shrink-0 border ' + cfg.iconCls;
+    iconEl.innerHTML = cfg.icon;
+    okBtn.className = 'btn ' + cfg.okCls + ' text-sm px-4';
+    return cfg;
+  }
+  function show({title, message, detail, variant, okText, cancelText}, onOk, onCancel) {
+    const cfg = applyVariant(variant);
+    titleEl.textContent = title || 'Konfirmasi';
+    msgEl.innerHTML = message || 'Yakin mau lanjut?';
+    if (detail) { detailEl.textContent = detail; detailWrap.classList.remove('hidden'); }
+    else { detailWrap.classList.add('hidden'); }
+    okBtn.textContent = okText || cfg.okText;
+    cancelBtn.textContent = cancelText || 'Batal';
+    pending = { onOk, onCancel };
+    modal.style.opacity = '1';
+    modal.classList.remove('pointer-events-none');
+    panel.style.transform = 'scale(1)';
+    panel.style.opacity = '1';
+    // focus for keyboard
+    setTimeout(() => okBtn.focus(), 50);
+  }
+  function hide(cancelled) {
+    modal.style.opacity = '0';
+    modal.classList.add('pointer-events-none');
+    panel.style.transform = 'scale(0.96)';
+    panel.style.opacity = '0';
+    const p = pending; pending = null;
+    if (p && cancelled && p.onCancel) p.onCancel();
+  }
+  okBtn.addEventListener('click', () => {
+    const p = pending; pending = null;
+    modal.style.opacity = '0';
+    modal.classList.add('pointer-events-none');
+    if (p && p.onOk) p.onOk();
+  });
+  cancelBtn.addEventListener('click', () => hide(true));
+  backdrop.addEventListener('click', () => hide(true));
+  document.addEventListener('keydown', e => {
+    if (modal.style.opacity === '1') {
+      if (e.key === 'Escape') hide(true);
+      else if (e.key === 'Enter') okBtn.click();
+    }
+  });
+  window.__confirm = show;
+
+  function interpolateForm(template, form) {
+    if (!template || !form) return template;
+    // Replace {field:name} with form input value (escaped)
+    return template.replace(/\{field:([\w-]+)\}/g, (_, name) => {
+      const inp = form.elements && form.elements[name];
+      if (!inp) return '';
+      const v = (inp.value || '').toString();
+      const div = document.createElement('div');
+      div.textContent = v;
+      return div.innerHTML;
+    });
+  }
+  function readAttrs(el, form) {
+    const f = form || (el instanceof HTMLFormElement ? el : null);
+    return {
+      message: interpolateForm(el.getAttribute('data-confirm'), f),
+      title: el.getAttribute('data-confirm-title'),
+      detail: interpolateForm(el.getAttribute('data-confirm-detail'), f),
+      variant: el.getAttribute('data-confirm-variant'),
+      okText: el.getAttribute('data-confirm-ok'),
+      cancelText: el.getAttribute('data-confirm-cancel'),
+    };
+  }
+
+  function loaderMessageForForm(f) {
+    const action = (f.getAttribute('action') || location.pathname).toLowerCase();
+    const method = formHttpMethod(f);
+    if (action.includes('/purchase/')) return 'Memproses pembelian…';
+    if (action.includes('/login/request-otp')) return 'Mengirim OTP…';
+    if (action.includes('/login/submit-otp')) return 'Verifikasi OTP…';
+    if (action.includes('/unsubscribe')) return 'Unsubscribe paket…';
+    if (action.includes('/bookmark')) return 'Update bookmark…';
+    if (action.includes('/register')) return 'Memproses register…';
+    return method === 'GET' ? 'Memuat…' : 'Memproses…';
+  }
+
+  function resetConfirmState(f) {
+    delete f.dataset.__confirmed;
+    delete f.dataset.__submitting;
+    delete f.dataset.__loaderShown;
+  }
+
+  function showConfirmForForm(f) {
+    resetConfirmState(f);
+    show(readAttrs(f, f), () => submitConfirmedForm(f), null);
+  }
+
+  // After confirm OK: POST via fetch so loader stays up until response (no submit-listener race).
+  function submitConfirmedForm(f) {
+    f.dataset.__confirmed = '1';
+    const action = f.getAttribute('action') || location.pathname;
+    const method = formHttpMethod(f);
+    const isPayment = action.toLowerCase().includes('/purchase/');
+    if (window.__loader) {
+      window.__loader.show(loaderMessageForForm(f), { payment: isPayment });
+    }
+    const go = () => {
+      const opts = { method, credentials: 'same-origin', redirect: 'follow' };
+      let url = action;
+      if (method === 'GET') {
+        const qs = new URLSearchParams(new FormData(f)).toString();
+        url = qs ? action + '?' + qs : action;
+      } else {
+        opts.body = new FormData(f);
+      }
+      fetch(url, opts)
+        .then((res) => {
+          if (res.redirected) {
+            window.location.href = res.url;
+            return;
+          }
+          return res.text().then((html) => {
+            document.open();
+            document.write(html);
+            document.close();
+          });
+        })
+        .catch(() => {
+          resetConfirmState(f);
+          if (window.__loader) window.__loader.hide();
+          alert('Gagal memproses. Coba lagi.');
+        });
+    };
+    requestAnimationFrame(() => requestAnimationFrame(go));
+  }
+
+  // Intercept form submits with data-confirm
+  document.addEventListener('submit', function(e){
+    const f = e.target;
+    if (!(f instanceof HTMLFormElement)) return;
+    if (!f.hasAttribute('data-confirm')) return;
+    if (f.dataset.__confirmed) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    showConfirmForForm(f);
+  }, true);
+
+  // Button trigger: Bayar -> modal -> Bayar Sekarang -> submit
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('[data-confirm-trigger]');
+    if (!btn) return;
+    const f = btn.closest('form');
+    if (!f || !f.hasAttribute('data-confirm')) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (!f.checkValidity()) { f.reportValidity(); return; }
+    showConfirmForForm(f);
+  }, true);
+
+  // Intercept link clicks with data-confirm
+  document.addEventListener('click', function(e){
+    const a = e.target.closest('a[data-confirm]');
+    if (!a) return;
+    if (a.dataset.__confirmed) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const attrs = readAttrs(a);
+    show(attrs,
+      () => {
+        a.dataset.__confirmed = '1';
+        if (window.__loader) window.__loader.show('Memproses…');
+        // double-RAF to let loader paint, then navigate
+        requestAnimationFrame(() => requestAnimationFrame(() => { window.location.href = a.href; }));
+      },
+      null);
+  }, true);
+})();
+
+// Global loader: show on form submit + internal nav clicks; hide on pageshow (incl. bfcache restore)
+(function(){
+  const loader = document.getElementById('page-loader');
+  const msg = document.getElementById('page-loader-msg');
+  const sub = document.getElementById('page-loader-sub');
+  const icon = document.getElementById('page-loader-icon');
+  const bar = document.getElementById('page-loader-bar');
+  const dots = document.getElementById('page-loader-dots');
+  if (!loader) return;
+  let timer = null;
+
+  function isPaymentAction(actionUrl) {
+    return (actionUrl || '').toLowerCase().includes('/purchase/');
+  }
+
+  function setMode(payment) {
+    loader.classList.toggle('is-payment', !!payment);
+    if (icon) icon.innerHTML = payment ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block animate-pulse"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>' : '<i class="fa-solid fa-spinner fa-spin text-indigo-400"></i>';
+    if (sub) sub.textContent = payment ? 'Jangan tutup halaman — lagi hubung ke MyXL…' : 'Tunggu sebentar ya cuy';
+    if (bar) bar.classList.toggle('hidden', !payment);
+    if (dots) dots.classList.toggle('hidden', !payment);
+  }
+
+  function show(text, opts) {
+    opts = opts || {};
+    if (text && msg) msg.textContent = text;
+    const payment = opts.payment || isPaymentAction(text);
+    setMode(payment);
+    loader.style.transition = 'none';
+    loader.style.opacity = '1';
+    // Visual overlay only — must not block navigation or fetch submit.
+    loader.classList.add('pointer-events-none');
+  }
+  function hide() {
+    loader.style.transition = 'opacity 180ms ease';
+    loader.style.opacity = '0';
+    loader.classList.add('pointer-events-none');
+    loader.classList.remove('is-payment');
+    if (timer) { clearTimeout(timer); timer = null; }
+  }
+  window.__loader = { show, hide };
+
+  // Hide on page load / bfcache restore
+  window.addEventListener('pageshow', hide);
+  document.addEventListener('DOMContentLoaded', hide);
+
+  // Default messages based on action
+  function describe(actionUrl, method) {
+    const u = (actionUrl || '').toLowerCase();
+    if (u.includes('/login/request-otp')) return 'Mengirim OTP…';
+    if (u.includes('/login/submit-otp')) return 'Verifikasi OTP…';
+    if (u.includes('/purchase/family-loop')) return 'Memulai bulk purchase…';
+    if (u.startsWith('/purchase/')) return 'Memproses pembelian…';
+    if (u.includes('/family-plan')) return 'Memproses family plan…';
+    if (u.includes('/circle')) return 'Memproses Circle…';
+    if (u.includes('/bookmark')) return 'Update bookmark…';
+    if (u.includes('/unsubscribe')) return 'Unsubscribe paket…';
+    if (u.includes('/accounts/activate')) return 'Mengganti akun…';
+    if (u.includes('/accounts/remove')) return 'Menghapus akun…';
+    if (u.includes('/register')) return 'Memproses register…';
+    if (u.includes('/validate')) return 'Memvalidasi…';
+    if (method === 'get' || method === 'GET') return 'Memuat…';
+    return 'Memproses…';
+  }
+
+  // Double-RAF: ensure browser repaints before actually navigating.
+  function paintThen(cb) {
+    requestAnimationFrame(() => requestAnimationFrame(cb));
+  }
+
+  // Form submits — capture phase, prevent default, show loader, force paint, then submit().
+  document.addEventListener('submit', function(e){
+    const f = e.target;
+    if (!(f instanceof HTMLFormElement)) return;
+    if (f.dataset.noLoader) return;
+    if (f.target === '_blank') return;
+    // Unconfirmed data-confirm forms are handled by the confirm modal.
+    if (f.hasAttribute('data-confirm') && !f.dataset.__confirmed) return;
+    // Confirmed: show loader and let the browser submit normally.
+    if (f.hasAttribute('data-confirm') && f.dataset.__confirmed) {
+      if (!f.dataset.__loaderShown) {
+        f.dataset.__loaderShown = '1';
+        const action = f.getAttribute('action') || location.pathname;
+        show(describe(action, formHttpMethod(f)), { payment: isPaymentAction(action) });
+      }
+      return;
+    }
+    if (f.dataset.__submitting) return;
+    e.preventDefault();
+    f.dataset.__submitting = '1';
+    const action = f.getAttribute('action') || location.pathname;
+    show(describe(action, formHttpMethod(f)), { payment: isPaymentAction(action) });
+    paintThen(() => { try { HTMLFormElement.prototype.submit.call(f); } catch (_) { f.dataset.__submitting = ''; hide(); } });
+  }, true);
+
+  // Link clicks → for slow internal routes, prevent default + show + paint + navigate.
+  const SLOW_PREFIXES = ['/packages/', '/hot', '/transactions', '/notifications',
+                         '/family-plan', '/circle', '/store/', '/bookmark',
+                         '/purchase/', '/accounts'];
+  document.addEventListener('click', function(e){
+    const a = e.target.closest('a');
+    if (!a) return;
+    if (a.target === '_blank' || a.hasAttribute('download') || a.dataset.noLoader) return;
+    const href = a.getAttribute('href') || '';
+    if (!href || href.startsWith('#') || href.startsWith('javascript:') || /^https?:\/\//i.test(href)) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (SLOW_PREFIXES.some(p => href.startsWith(p))) {
+      e.preventDefault();
+      show(describe(href, 'GET'));
+      paintThen(() => { location.href = a.href; });
+    }
+  });
+
+  // Safety: hide on back/forward gestures that we missed
+  window.addEventListener('beforeunload', () => {});
+})();
+</script>
+  <script src="/static/js/msisdn-toggle.js"></script>
+</body>
+</html>

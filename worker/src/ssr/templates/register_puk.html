@@ -1,0 +1,15 @@
+<div class="max-w-md mx-auto">
+  <div class="card">
+    <h1 class="text-xl font-bold mb-3">PUK Validation</h1>
+    <form action="/register/puk" method="post" class="space-y-3">
+      <div><label class="label">MSISDN (628xxx)</label><input class="form-input" name="msisdn" pattern="628\d{7,11}" value="{{msisdn}}" required></div>
+      <div><label class="label">PUK</label><input class="form-input" name="puk" required></div>
+      <button class="btn btn-primary w-full" type="submit">Validasi</button>
+    </form>
+  </div>
+  {{#has_res}}
+  <div class="card mt-3">
+    <pre class="text-xs overflow-x-auto bg-[#0f172a] rounded-xl p-2">{{res_json}}</pre>
+  </div>
+  {{/has_res}}
+</div>

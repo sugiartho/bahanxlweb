@@ -1,0 +1,68 @@
+<h1 class="text-xl font-bold mb-4">Circle</h1>
+
+<div class="card mb-3">
+  <h2 class="font-bold mb-2">Group</h2>
+  <pre class="text-xs overflow-x-auto rounded-xl p-2">{{group_json}}</pre>
+</div>
+
+{{#has_members}}
+<div class="card mb-3">
+  <h2 class="font-bold mb-2">Members</h2>
+  <pre class="text-xs overflow-x-auto rounded-xl p-2">{{members_json}}</pre>
+</div>
+{{/has_members}}
+
+{{#has_spend}}
+<div class="card mb-3">
+  <h2 class="font-bold mb-2">Spending Tracker</h2>
+  <pre class="text-xs overflow-x-auto rounded-xl p-2">{{spend_json}}</pre>
+</div>
+{{/has_spend}}
+
+{{#has_bonus}}
+<div class="card mb-3">
+  <h2 class="font-bold mb-2">Bonus</h2>
+  <pre class="text-xs overflow-x-auto rounded-xl p-2">{{bonus_json}}</pre>
+</div>
+{{/has_bonus}}
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+  <div class="card">
+    <h2 class="font-bold mb-2">Invite Member</h2>
+    <form action="/circle/invite" method="post" class="space-y-2">
+      <input class="form-input" name="msisdn" placeholder="MSISDN (628xxx)" required>
+      <input class="form-input" name="name" placeholder="Nama" required>
+      <input class="form-input" name="group_id" placeholder="Group ID" value="{{group_id}}" required>
+      <input class="form-input" name="member_id_parent" placeholder="Member ID Parent" required>
+      <button class="btn btn-primary w-full" type="submit">Invite</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2 class="font-bold mb-2">Accept Invitation</h2>
+    <form action="/circle/accept" method="post" class="space-y-2">
+      <input class="form-input" name="group_id" placeholder="Group ID" required>
+      <input class="form-input" name="member_id" placeholder="Member ID" required>
+      <button class="btn btn-primary w-full" type="submit">Accept</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2 class="font-bold mb-2">Create Circle</h2>
+    <form action="/circle/create" method="post" class="space-y-2">
+      <input class="form-input" name="parent_name" placeholder="Parent name" required>
+      <input class="form-input" name="group_name" placeholder="Group name" required>
+      <input class="form-input" name="member_msisdn" placeholder="Member MSISDN (628xxx)" required>
+      <input class="form-input" name="member_name" placeholder="Member name" required>
+      <button class="btn btn-primary w-full" type="submit">Create</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2 class="font-bold mb-2">Remove Member</h2>
+    <form action="/circle/remove" method="post" class="space-y-2">
+      <input class="form-input" name="member_id" placeholder="Member ID" required>
+      <input class="form-input" name="group_id" placeholder="Group ID" value="{{group_id}}" required>
+      <input class="form-input" name="member_id_parent" placeholder="Member ID Parent" required>
+      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="is_last_member" value="true"> Last member?</label>
+      <button class="btn btn-danger w-full" type="submit">Remove</button>
+    </form>
+  </div>
+</div>

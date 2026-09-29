@@ -1,0 +1,27 @@
+<div class="card mb-4">
+  <h1 class="text-xl font-bold">{{fam_name}}</h1>
+  <div class="text-xs text-slate-400 mt-1 code-wrap">{{code}}</div>
+  <div class="text-xs text-slate-400">Payment for: {{payment_for}} · Plan: {{plan_type}}</div>
+</div>
+
+{{#variants}}
+<div class="card mb-3">
+  <h2 class="font-bold text-lg mb-3">{{name}}</h2>
+  {{#has_options}}
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+  {{#options}}
+    <a href="/packages/by-option?code={{package_option_code}}" class="rounded-[14px] p-3 transition-colors neu-box-sm hover:bg-slate-800/50">
+      <div class="font-medium">{{name}}</div>
+      <div class="text-indigo-300 font-bold">{{price_rp}}</div>
+      <div class="text-xs text-slate-400 mt-1">{{validity}}{{#has_point}} · {{point}} pts{{/has_point}}</div>
+    </a>
+  {{/options}}
+  </div>
+  {{/has_options}}
+</div>
+{{/variants}}
+
+<form action="/purchase/family-loop" method="get" class="card">
+  <input type="hidden" name="family_code" value="{{code}}">
+  <button class="btn btn-secondary w-full" type="submit">Loop beli semua paket di family ini</button>
+</form>

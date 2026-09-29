@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+{% block title %}Monitoring · Webui-XL{% endblock %}
+{% block content %}
+
+{% set msg = request.query_params.get('msg', '') %}
+{% if msg == 'refreshed' %}
+<div class="alert-success"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Data kuota berhasil di-refresh.</div>
+{% elif msg == 'rule_added' %}
+<div class="alert-success"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Rule berhasil ditambahkan.</div>
+{% elif msg == 'rule_deleted' %}
+<div class="alert-warning"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> Rule dihapus.</div>
+{% elif msg == 'ran' %}
+<div class="alert-success"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Monitor run-once selesai. Cek log di bawah.</div>
+{% endif %}
+
+<!-- Header -->
+<div class="flex items-center justify-between gap-3 mb-6">
+  <h1 class="text-xl font-bold text-white shrink-0">Monitoring</h1>
+  <div class="flex gap-2 shrink-0">
+    <form action="/monitoring/refresh" method="post">
+      <button type="submit" class="btn btn-secondary text-xs px-2.5 py-1.5 sm:px-3 inline-flex items-center justify-center gap-1.5" title="Refresh Data" aria-label="Refresh Data">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+        <span class="hidden sm:inline">Refresh Data</span>
+      </button>
+    </form>
+    <form action="/monitoring/run-once" method="post">
+      <button type="submit" class="btn btn-primary text-xs px-2.5 py-1.5 sm:px-3 inline-flex items-center justify-center gap-1.5" title="Run Once" aria-label="Run Once">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <span class="hidden sm:inline">Run Once</span>
+      </button>
+    </form>
+    <a href="/monitoring/telegram" class="btn btn-secondary text-xs px-2.5 py-1.5 sm:px-3 inline-flex items-center justify-center gap-1.5" title="Telegram Settings" aria-label="Telegram Settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <span class="hidden sm:inline">Telegram Settings</span>
+    </a>
+  </div>
+</div>
+
+<!-- Telegram Status -->
+<div class="card mb-6">
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded bg-slate-800 flex items-center justify-center shrink-0 text-indigo-400">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>
+    </div>
+    <div>
+      <div class="text-sm font-semibold text-white">Telegram Bot</div>
+      {% if tg_global.get('enabled') and tg_global.get('bot_token') %}
+        <span class="text-xs text-emerald-400">Aktif</span>
+      {% else %}
+        <span class="text-xs text-slate-500">Nonaktif — <a href="/monitoring/telegram" class="text-indigo-400 hover:underline">Setup</a></span>
+      {% endif %}
+      {% if tg.get('chat_id') %}
+        <span class="text-xs text-slate-400 ml-2">· Chat ID: <code>{{ tg.chat_id }}</code></span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Account Status Cards -->
+<section class="mb-6">
+  <h2 class="text-sm uppercase tracking-wider text-slate-400 mb-3">Status Akun</h2>
+  {% if cache %}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {% for msisdn, data in cache.items() %}
+    <div class="card">
+      <div class="flex items-center justify-between mb-3">
+        <div class="font-mono text-sm font-bold text-white">{{ msisdn }}</div>
+        {% if data.updated_at %}
+        <div class="text-xs text-slate-500">{{ data.updated_at | ts }}</div>
+        {% endif %}
+      </div>
+
+      {% if data.balance %}
+      <div class="mb-3 rounded-[14px] p-2 neu-box-sm">
+        <div class="text-xs text-indigo-300">Pulsa</div>
+        <div class="font-bold text-white">
+          {% if data.balance.remaining is not none %}{{ data.balance.remaining | rp }}{% else %}—{% endif %}
+        </div>
+        {% if data.balance.expired_at %}
+        <div class="text-xs text-slate-400">Aktif s/d {{ data.balance.expired_at | date }}</div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% if data.quotas %}
+      <div class="space-y-2">
+        {% for q in data.quotas[:6] %}
+        <div class="rounded-[14px] p-2">
+          <div class="text-xs font-medium text-slate-200 theme-light:text-slate-700 mb-1">
+            {{ q.name or q.package_family.name or q.package_variants.display_name or q.package_variants.name or q.group_name or '-' }}
+          </div>
+          {% for b in (q.benefits or [])[:3] %}
+          {% set rem = b.remaining or 0 %}
+          {% set tot = b.total or 0 %}
+          {% set pct = ((rem / tot) * 100) if tot else 0 %}
+          <div class="mb-2 last:mb-0">
+            {% if b.name %}<div class="text-[0.65rem] text-slate-500 mb-0.5 truncate">{{ b.name }}</div>{% endif %}
+            <div class="flex items-center gap-2">
+            <div class="flex-1">
+              <div class="h-1.5 rounded-full bg-slate-700 overflow-hidden">
+                <div class="h-full rounded-full {% if pct > 50 %}bg-emerald-400{% elif pct > 20 %}bg-amber-400{% else %}bg-red-400{% endif %}" style="width:{{ [pct, 100]|min }}%"></div>
+              </div>
+            </div>
+            <div class="text-xs text-slate-400 w-20 text-right shrink-0">
+              {% if b.data_type == 'DATA' %}{{ rem | bytes }}/{{ tot | bytes }}{% elif b.data_type == 'VOICE' %}{{ (rem/60)|int }}m{% else %}{{ rem }}{% endif %}
+              <span class="text-slate-600">({{ "%.0f"|format(pct) }}%)</span>
+            </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-xs text-slate-500">(belum ada data kuota)</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card text-center text-slate-500">
+    Belum ada data. Klik <b>Refresh Data</b> untuk mengambil kuota terbaru.
+  </div>
+  {% endif %}
+</section>
+
+<!-- Rules -->
+<section class="mb-6">
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-sm uppercase tracking-wider text-slate-400">Aturan Monitoring</h2>
+  </div>
+
+  {% if rules %}
+  <div class="space-y-2 mb-4">
+    {% for r in rules %}
+    <div class="card {% if not r.enabled %}opacity-50{% endif %}">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div class="min-w-0">
+          <span class="font-medium text-sm text-white">{{ r.name or 'Untitled' }}</span>
+          <span class="text-xs text-slate-500 ml-2">{{ r.msisdn }}</span>
+          {% if r.last_status %}
+          <span class="text-xs ml-2 {% if r.last_status == 'ok' %}text-emerald-400{% elif r.last_status == 'error' %}text-red-400{% else %}text-amber-400{% endif %}">
+            {{ r.last_status }}
+          </span>
+          {% endif %}
+        </div>
+        <div class="flex gap-1 shrink-0">
+          <form action="/monitoring/rules/{{ r.id }}/toggle" method="post" data-no-loader>
+            <button type="submit" class="btn btn-secondary text-xs px-2.5 py-1">
+              {% if r.enabled %}Aktif{% else %}Nonaktif{% endif %}
+            </button>
+          </form>
+          <form action="/monitoring/rules/{{ r.id }}/delete" method="post" data-confirm="Hapus rule '{{ r.name }}'?" data-confirm-variant="danger">
+            <button type="submit" class="btn btn-danger text-xs px-2.5 py-1">Hapus</button>
+          </form>
+        </div>
+      </div>
+      <div class="text-xs text-slate-500 mt-1 leading-relaxed">
+        {% if r.match.kind == 'any' or not r.match.value %}Semua kuota{% else %}Nama kuota: {{ r.match.value }}{% endif %}
+        · Sisa kuota (%) {% if r.trigger.op == 'lt' %}kurang dari{% elif r.trigger.op == 'lte' %}kurang/sama dengan{% elif r.trigger.op == 'gt' %}lebih dari{% elif r.trigger.op == 'gte' %}lebih/sama dengan{% else %}sama dengan{% endif %} {{ r.trigger.value }}
+        · jeda {{ r.cooldown_seconds }} dtk
+        {% if r.last_fired_at %}· terakhir jalan {{ r.last_fired_at | ts }}{% endif %}
+      </div>
+      {% if r.last_msg %}
+      <div class="text-xs text-slate-400 mt-1 truncate">{{ r.last_msg }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card text-center text-slate-500">
+    Belum ada aturan. Tambah di bawah ya.
+  </div>
+  {% endif %}
+
+  <details class="card">
+    <summary class="cursor-pointer px-4 py-3 text-sm font-medium text-indigo-300 hover:text-indigo-200">+ Tambah Aturan Baru</summary>
+    <form action="/monitoring/rules" method="post" class="p-4 space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="label">Nama Aturan</label>
+          <input name="name" class="form-input" placeholder="Alert kuota rendah">
+        </div>
+        <div>
+          <label class="label">Nomor</label>
+          <select name="msisdn" id="rule_msisdn" class="form-input">
+            {% for acc in myxl_accounts %}
+            <option value="{{ acc.number }}">{{ acc.number }} · {{ acc.subscription_type or '?' }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      {% if not has_quota_options %}
+      <div class="text-xs text-amber-300 neu-inset-card rounded-xl px-3 py-2 leading-relaxed">
+        Daftar kuota belum tersedia. Klik <b>Refresh Data</b> di atas dulu supaya nama paket aktif bisa dipilih.
+      </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="label">Nama Kuota</label>
+          <select id="rule_quota" class="form-input">
+            <option value="" data-kind="any">Semua kuota</option>
+            {% for q in quota_options %}
+            <option value="{{ q.name }}" data-msisdn="{{ q.msisdn }}" data-kind="quota_name">{{ q.name }} · {{ q.msisdn }}</option>
+            {% endfor %}
+          </select>
+          <input type="hidden" name="match_kind" id="match_kind" value="any">
+          <input type="hidden" name="match_value" id="match_value" value="">
+        </div>
+        <div>
+          <label class="label">Tipe Benefit</label>
+          <select name="match_data_type" class="form-input">
+            <option value="ANY">Semua</option>
+            <option value="DATA">Data Internet</option>
+            <option value="VOICE">Telepon</option>
+            <option value="TEXT">SMS</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="label">Kondisi</label>
+          <select name="trigger_metric" class="form-input">
+            <option value="remaining_pct">Sisa kuota (%)</option>
+            <option value="remaining_bytes">Sisa data (byte)</option>
+            <option value="remaining_minutes">Sisa menit telepon</option>
+            <option value="expiring_in_days">Hari sampai habis</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Operator</label>
+          <select name="trigger_op" class="form-input">
+            <option value="lt">Kurang dari (&lt;)</option>
+            <option value="lte">Kurang/sama (&lt;=)</option>
+            <option value="gt">Lebih dari (&gt;)</option>
+            <option value="gte">Lebih/sama (&gt;=)</option>
+            <option value="eq">Sama dengan (=)</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Nilai</label>
+          <input name="trigger_value" type="number" value="10" class="form-input" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="label">Aksi</label>
+          <select name="action_type" id="action_type" class="form-input" onchange="toggleActionFields()">
+            <option value="telegram">Kirim Telegram</option>
+            <option value="buy_option">Beli Paket (otomatis)</option>
+            <option value="unsubscribe">Stop paket</option>
+            <option value="telegram_and_buy">Telegram + beli otomatis</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Jeda pengulangan (detik)</label>
+          <input name="cooldown_seconds" type="number" value="3600" class="form-input" inputmode="numeric">
+        </div>
+      </div>
+
+      <div id="tg_fields">
+        <label class="label">Pesan Telegram</label>
+        <textarea name="action_message" rows="6" class="form-input text-sm leading-relaxed">{{ default_telegram_message }}</textarea>
+        <div class="text-xs text-slate-500 mt-1 leading-relaxed">Variabel: <code class="text-slate-400">{quota}</code>, <code class="text-slate-400">{benefit}</code>, <code class="text-slate-400">{pct}</code>, <code class="text-slate-400">{remaining}</code>, <code class="text-slate-400">{total}</code>, <code class="text-slate-400">{msisdn}</code></div>
+      </div>
+
+      <div id="buy_fields" class="hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="label">Kode Paket</label>
+            <input name="action_option_code" class="form-input" placeholder="U0Nf...">
+          </div>
+          <div>
+            <label class="label">Metode Bayar</label>
+            <select name="action_method" class="form-input">
+              <option value="balance">Pulsa</option>
+              <option value="qris">QRIS</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary text-sm w-full sm:w-auto px-4 py-2">Simpan Aturan</button>
+    </form>
+  </details>
+</section>
+
+<!-- Log -->
+<section>
+  <details class="card">
+    <summary class="cursor-pointer px-4 py-3 text-sm font-medium text-slate-300 hover:text-white">Monitor Log ({{ log_lines|length }} baris terakhir)</summary>
+    <div class="p-4 max-h-96 overflow-y-auto">
+      {% if log_lines %}
+      <pre class="text-xs text-slate-400 font-mono whitespace-pre-wrap">{% for l in log_lines %}{{ l }}
+{% endfor %}</pre>
+      {% else %}
+      <div class="text-sm text-slate-500">Log kosong.</div>
+      {% endif %}
+    </div>
+  </details>
+</section>
+
+<script>
+function toggleActionFields() {
+  const t = document.getElementById('action_type').value;
+  const tgF = document.getElementById('tg_fields');
+  const buyF = document.getElementById('buy_fields');
+  tgF.classList.toggle('hidden', t === 'buy_option' || t === 'unsubscribe');
+  buyF.classList.toggle('hidden', t === 'telegram' || t === 'unsubscribe');
+}
+
+(function () {
+  const msisdnSel = document.getElementById('rule_msisdn');
+  const quotaSel = document.getElementById('rule_quota');
+  const kindInp = document.getElementById('match_kind');
+  const valueInp = document.getElementById('match_value');
+  if (!msisdnSel || !quotaSel || !kindInp || !valueInp) return;
+
+  const scopedOpts = Array.from(quotaSel.querySelectorAll('option[data-msisdn]'));
+
+  function syncMatchFields() {
+    const opt = quotaSel.selectedOptions[0];
+    kindInp.value = opt?.dataset.kind || 'any';
+    valueInp.value = quotaSel.value || '';
+  }
+
+  function syncQuotaOptions() {
+    const msisdn = msisdnSel.value;
+    let currentValid = !quotaSel.value;
+    for (const opt of scopedOpts) {
+      const show = opt.dataset.msisdn === msisdn;
+      opt.hidden = !show;
+      opt.disabled = !show;
+      if (show && opt.value === quotaSel.value) currentValid = true;
+    }
+    if (!currentValid) quotaSel.value = '';
+    syncMatchFields();
+  }
+
+  msisdnSel.addEventListener('change', syncQuotaOptions);
+  quotaSel.addEventListener('change', syncMatchFields);
+  syncQuotaOptions();
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,89 @@
+{
+  "name": "webui-xl-worker",
+  "private": true,
+  "type": "module",
+  "cloudflare": {
+    "bindings": {
+      "SESSION_SECRET": {
+        "description": "Random signing key for cookies. Generate with `openssl rand -hex 32`."
+      },
+      "STORAGE_ENCRYPTION_KEY": {
+        "description": "AES-256 key for user blobs in R2 (64-char hex). **Must match** the key used when migrating `webui_data/`."
+      },
+      "BASE_API_URL": {
+        "description": "MyXL API base URL — see [Telegram channel](https://t.me/alyxcli) or maintainer."
+      },
+      "BASE_CIAM_URL": {
+        "description": "MyXL CIAM endpoint (from project env bundle)."
+      },
+      "BASIC_AUTH": {
+        "description": "HTTP Basic auth header value for API requests."
+      },
+      "UA": {
+        "description": "User-Agent string required by the API."
+      },
+      "API_KEY": {
+        "description": "API key for request signing."
+      },
+      "AES_KEY_ASCII": {
+        "description": "AES key (ASCII) for payload crypto."
+      },
+      "AX_FP_KEY": {
+        "description": "Fingerprint derivation key."
+      },
+      "AX_FP": {
+        "description": "Default device fingerprint (32-char hex) — per-user overrides live in R2."
+      },
+      "ENCRYPTED_FIELD_KEY": {
+        "description": "Key for encrypted form fields."
+      },
+      "XDATA_KEY": {
+        "description": "x-data header signing key."
+      },
+      "AX_API_SIG_KEY": {
+        "description": "API signature key."
+      },
+      "X_API_BASE_SECRET": {
+        "description": "Base secret for API signatures."
+      },
+      "TELEGRAM_BOT_TOKEN": {
+        "description": "Optional — BotFather token for Telegram webhook mode."
+      },
+      "TELEGRAM_WEBHOOK_SECRET": {
+        "description": "Optional — `secret_token` for Telegram `setWebhook`."
+      },
+      "GOOGLE_CLIENT_ID": {
+        "description": "Google OAuth Client ID for Sign in with Google."
+      },
+      "GOOGLE_CLIENT_SECRET": {
+        "description": "Google OAuth Client Secret."
+      }
+    }
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "bash scripts/with-cf-env.sh npm run db:migrations:apply && bash scripts/with-cf-env.sh wrangler deploy",
+    "deploy:staging": "bash scripts/with-cf-env.sh npm run db:migrations:apply:staging && bash scripts/with-cf-env.sh wrangler deploy --env staging",
+    "deploy:production": "bash scripts/with-cf-env.sh npm run db:migrations:apply:production && bash scripts/with-cf-env.sh wrangler deploy --env production",
+    "db:migrations:apply": "wrangler d1 migrations apply DB --remote",
+    "db:migrations:apply:staging": "wrangler d1 migrations apply DB --remote --env staging",
+    "db:migrations:apply:production": "wrangler d1 migrations apply DB --remote --env production",
+    "test": "vitest run",
+    "test:e2e": "vitest run e2e/local-smoke.test.ts",
+    "test:e2e:staging": "vitest run e2e/staging.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noble/ciphers": "^1.2.1",
+    "@noble/hashes": "^2.2.0",
+    "hono": "^4.7.4",
+    "mustache": "^4.2.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250224.0",
+    "@types/mustache": "^4.2.6",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.8",
+    "wrangler": "^4.14.0"
+  }
+}

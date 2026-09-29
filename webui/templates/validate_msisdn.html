@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Validate MSISDN · Webui-XL{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto">
+  <div class="card">
+    <h1 class="text-xl font-bold mb-3"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Validate MSISDN</h1>
+    <form action="/validate-msisdn" method="post" class="space-y-3">
+      <div><label class="label">MSISDN (628xxx)</label><input class="form-input" name="msisdn" pattern="628\d{7,11}" value="{{ msisdn or '' }}" required></div>
+      <button class="btn btn-primary w-full" type="submit">Cek</button>
+    </form>
+  </div>
+  {% if res %}
+  <div class="card mt-3">
+    <pre class="text-xs overflow-x-auto bg-[#0f172a] rounded-xl p-2">{{ res | tojson(indent=2) }}</pre>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

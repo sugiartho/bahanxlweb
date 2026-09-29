@@ -1,0 +1,205 @@
+<div class="max-w-2xl mx-auto">
+{{#msg_saved}}<div class="alert-success">Settings disimpan.</div>{{/msg_saved}}
+{{#msg_webhook_ok}}<div class="alert-success">Webhook Telegram berhasil didaftarkan.</div>{{/msg_webhook_ok}}
+{{#msg_webhook_fail}}<div class="alert-error">Gagal daftar webhook. Pastikan bot token valid lalu coba lagi.</div>{{/msg_webhook_fail}}
+{{#msg_test_ok}}<div class="alert-success">Test message terkirim!</div>{{/msg_test_ok}}
+{{#msg_test_fail}}<div class="alert-error">Gagal kirim test message.{{#has_test_info}} <span class="block mt-1 text-xs opacity-90">{{test_info}}</span>{{/has_test_info}}{{^has_test_info}} Cek bot token &amp; chat ID.{{/has_test_info}}</div>{{/msg_test_fail}}
+{{#msg_link_code}}<div class="alert-success">Kode link dibuat. Kirim ke bot: <code class="break-all">/link {{link_code}}</code> (expired 10 menit)</div>{{/msg_link_code}}
+{{#msg_no_chat_id}}<div class="alert-warning break-words">Chat ID belum ada. Generate kode link di bawah, lalu kirim ke bot: <code class="break-all">/link KODE</code></div>{{/msg_no_chat_id}}
+
+<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+  <h1 class="text-lg sm:text-xl font-bold text-white theme-light:text-slate-900 flex items-center gap-2 min-w-0">
+    <span class="neu-header-icon text-indigo-400 shrink-0">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>
+    </span>
+    <span class="truncate">Telegram Bot<span class="hidden sm:inline"> Settings</span></span>
+  </h1>
+  <a href="/monitoring" class="btn btn-secondary text-xs inline-flex items-center justify-center gap-1.5 w-full sm:w-auto shrink-0">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    Monitoring
+  </a>
+</div>
+
+<form action="/monitoring/telegram" method="post" class="space-y-4 sm:space-y-6">
+  <div class="card space-y-4">
+    <h2 class="text-sm font-semibold text-white theme-light:text-slate-800 uppercase tracking-wider">Bot Configuration</h2>
+
+    <div>
+      <label class="label">Bot Token (dari @BotFather)</label>
+      <div class="relative mt-1">
+        <input name="bot_token" id="bot_token" type="password" value=""
+               class="form-input pr-14 text-sm sm:text-base" placeholder="{{#has_bot_token}}Token tersimpan — isi ulang hanya jika ganti{{/has_bot_token}}{{^has_bot_token}}123456:ABC-DEF...{{/has_bot_token}}" autocomplete="off">
+        <button type="button" onclick="toggleToken()" class="absolute right-1 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white px-2 py-2 min-w-[2.75rem]">Show</button>
+      </div>
+      <div class="text-xs text-slate-500 mt-1 leading-relaxed">Buat bot via <a href="https://t.me/BotFather" target="_blank" rel="noopener" class="text-indigo-400 hover:underline">@BotFather</a> di Telegram.</div>
+    </div>
+
+    <div class="flex items-start gap-3 py-1">
+      <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+        <input type="checkbox" name="enabled" class="sr-only peer" {{#tg_global.enabled}}checked{{/tg_global.enabled}}>
+        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-indigo-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+      </label>
+      <span class="text-sm text-slate-300 min-w-0 leading-snug">Bot aktif</span>
+    </div>
+  </div>
+
+  <div class="card space-y-4">
+    <h2 class="text-sm font-semibold text-white theme-light:text-slate-800 uppercase tracking-wider">Daily Summary</h2>
+
+    <div class="flex items-start gap-3 py-1">
+      <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+        <input type="checkbox" name="daily_summary_enabled" class="sr-only peer" {{#tg_global.daily_summary_enabled}}checked{{/tg_global.daily_summary_enabled}}>
+        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-indigo-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+      </label>
+      <span class="text-sm text-slate-300 min-w-0 leading-snug">Kirim ringkasan harian ke Telegram</span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+      <div>
+        <label class="label">Jam (WIB)</label>
+        <select name="daily_summary_hour" class="form-input">
+          {{#hour_options}}
+          <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+          {{/hour_options}}
+        </select>
+      </div>
+      <div>
+        <label class="label">Menit</label>
+        <select name="daily_summary_minute" class="form-input">
+          {{#minute_options}}
+          <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+          {{/minute_options}}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card space-y-4">
+    <h2 class="text-sm font-semibold text-white theme-light:text-slate-800 uppercase tracking-wider">Monitoring</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+      <div>
+        <label class="label">Low Quota Threshold (%)</label>
+        <input name="low_quota_threshold_pct" type="number" value="{{tg_global.low_quota_threshold_pct}}" min="1" max="100" class="form-input" inputmode="numeric">
+      </div>
+      <div>
+        <label class="label">Poll Interval (menit)</label>
+        <input name="poll_interval_minutes" type="number" value="{{tg_global.poll_interval_minutes}}" min="1" max="60" class="form-input" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary text-sm w-full sm:w-auto px-6 py-2.5">Simpan</button>
+</form>
+
+<div class="card mt-4 sm:mt-6 space-y-4">
+  <h2 class="text-sm font-semibold text-white theme-light:text-slate-800 uppercase tracking-wider">Webhook Status</h2>
+
+  {{#has_bot_token}}
+  <div class="space-y-3">
+    <div class="flex items-center gap-2">
+      {{#webhook_ok}}
+      <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></div>
+      <span class="text-sm text-emerald-300">Webhook aktif</span>
+      {{/webhook_ok}}
+      {{^webhook_ok}}
+      <div class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></div>
+      <span class="text-sm text-amber-300">Webhook belum terdaftar / URL tidak cocok</span>
+      {{/webhook_ok}}
+    </div>
+
+    <div class="neu-inset-card rounded-xl p-3 sm:p-4 space-y-2 text-xs text-slate-400 leading-relaxed">
+      <div>
+        <span class="text-slate-500">URL yang diharapkan:</span>
+        <code class="block mt-1 break-all text-slate-300">{{expected_webhook_url}}</code>
+      </div>
+      {{#registered_webhook_url}}
+      <div>
+        <span class="text-slate-500">URL terdaftar di Telegram:</span>
+        <code class="block mt-1 break-all text-slate-300">{{registered_webhook_url}}</code>
+      </div>
+      {{/registered_webhook_url}}
+      {{^registered_webhook_url}}
+      <div class="text-amber-300/90">Belum ada webhook terdaftar — bot tidak akan menerima pesan sampai didaftarkan.</div>
+      {{/registered_webhook_url}}
+      {{#webhook_pending_updates}}
+      <div>Update menunggu: <span class="text-slate-300">{{webhook_pending_updates}}</span></div>
+      {{/webhook_pending_updates}}
+      {{#has_webhook_error}}
+      <div class="text-red-300/90">Error terakhir: {{webhook_last_error}}</div>
+      {{/has_webhook_error}}
+    </div>
+
+    <form action="/monitoring/telegram/webhook" method="post">
+      <button type="submit" class="btn btn-secondary text-xs w-full sm:w-auto px-4 py-2 inline-flex items-center justify-center gap-1.5">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+        Daftar ulang webhook
+      </button>
+    </form>
+  </div>
+  {{/has_bot_token}}
+  {{^has_bot_token}}
+  <div class="text-sm text-slate-400">Isi bot token dulu, lalu simpan untuk mendaftarkan webhook otomatis.</div>
+  {{/has_bot_token}}
+</div>
+
+<div class="card mt-4 sm:mt-6 space-y-4">
+  <h2 class="text-sm font-semibold text-white theme-light:text-slate-800 uppercase tracking-wider">Link Status</h2>
+
+  {{#has_chat_id}}
+  <div class="space-y-3">
+    <div class="flex items-center gap-2">
+      <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></div>
+      <span class="text-sm text-emerald-300">Terhubung</span>
+    </div>
+    <div class="neu-inset-card rounded-xl px-3 py-2.5 min-w-0">
+      <code class="text-xs text-slate-400 font-mono break-all">Chat ID: {{chat_id}}</code>
+    </div>
+    <form action="/monitoring/telegram/test" method="post">
+      <button type="submit" class="btn btn-secondary text-xs w-full sm:w-auto px-4 py-2 inline-flex items-center justify-center gap-1.5">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        Kirim Test Message
+      </button>
+    </form>
+  </div>
+  {{/has_chat_id}}
+  {{^has_chat_id}}
+  <div class="space-y-3">
+    <div class="flex items-center gap-2">
+      <div class="w-2.5 h-2.5 rounded-full bg-slate-600 shrink-0"></div>
+      <span class="text-sm text-slate-400">Belum terhubung</span>
+    </div>
+    <div class="neu-inset-card rounded-xl p-3 sm:p-4 text-sm text-slate-300">
+      <p class="mb-2 font-medium text-slate-200 theme-light:text-slate-700">Cara menghubungkan akun:</p>
+      <ol class="list-decimal list-inside space-y-2 text-xs text-slate-400 leading-relaxed">
+        <li>Pastikan bot token sudah diisi dan bot aktif</li>
+        <li>Klik <b>Generate kode link</b> di bawah (berlaku 10 menit)</li>
+        <li>Buka bot di Telegram, kirim:
+          <div class="mt-1 neu-box-sm rounded-lg px-2 py-1.5 font-mono text-[0.7rem] break-all text-slate-300">/link KODE</div>
+        </li>
+      </ol>
+    </div>
+    <form action="/monitoring/telegram/link-code" method="post">
+      <button type="submit" class="btn btn-secondary text-xs w-full sm:w-auto px-4 py-2 inline-flex items-center justify-center gap-1.5">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        Generate kode link
+      </button>
+    </form>
+    {{#has_link_code}}
+    <div class="neu-inset-card rounded-xl px-3 py-2.5">
+      <code class="text-sm font-mono text-emerald-300 break-all">/link {{link_code}}</code>
+    </div>
+    {{/has_link_code}}
+  </div>
+  {{/has_chat_id}}
+</div>
+</div>
+
+<script>
+function toggleToken() {
+  const inp = document.getElementById('bot_token');
+  const btn = inp.nextElementSibling;
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
+  else { inp.type = 'password'; btn.textContent = 'Show'; }
+}
+</script>

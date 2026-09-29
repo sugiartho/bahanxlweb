@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · Webui-XL{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold mb-4">{{ title }}</h1>
+<div class="card">
+  <pre class="text-xs overflow-x-auto rounded-xl p-2">{{ res | tojson(indent=2) }}</pre>
+</div>
+<a class="btn btn-secondary mt-4" href="/family-plan">← Kembali</a>
+{% endblock %}

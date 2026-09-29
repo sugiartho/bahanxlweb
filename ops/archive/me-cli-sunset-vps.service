@@ -1,0 +1,24 @@
+# Archived reference — VPS systemd unit for legacy Python WebUI (pre-Worker cutover)
+#
+# Install location (historical): /etc/systemd/system/me-cli-sunset.service
+# Disable after Cloudflare Worker production cutover:
+#   sudo systemctl stop me-cli-sunset.service
+#   sudo systemctl disable me-cli-sunset.service
+#
+# See docs/cutover-runbook.md Phase 7.
+
+[Unit]
+Description=me-cli WebUI (uvicorn / FastAPI)
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/me-cli-sunset
+EnvironmentFile=/opt/me-cli-sunset/.env
+ExecStart=/opt/me-cli-sunset/venv/bin/uvicorn webui.app:app --host 127.0.0.1 --port 8089
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id" class="{% if user_theme == 'light' %}theme-light{% endif %}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if mode == 'register' %}Register Webui-XL{% else %}Login Webui-XL{% endif %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/custom.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cstyle%3E@media (prefers-color-scheme: dark) %7B polygon %7B stroke: %23818cf8; %7D %7D%3C/style%3E%3Cpolygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'%3E%3C/polygon%3E%3C/svg%3E">
+</head>
+<body class="bg-[#0f172a] text-slate-100 min-h-screen flex items-center justify-center p-4">
+<div class="max-w-md w-full">
+
+  <div class="text-center mb-6">
+    <div class="text-5xl mb-3 text-indigo-400"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
+    <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-300 via-purple-300 to-fuchsia-300 bg-clip-text text-transparent">Webui-XL</h1>
+    <p class="text-xs text-slate-500 mt-1">WebUI multi-user untuk MyXL</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="neu-tabs flex gap-1 mb-4">
+    <a href="/u/login{% if username %}?username={{ username }}{% endif %}"
+       class="flex-1 text-center px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-center gap-1.5 {% if mode == 'login' %}neu-tab-active{% else %}text-slate-400 hover:text-white hover:bg-slate-800{% endif %}">
+      <i class="fa-solid fa-key text-indigo-400"></i>
+      <span>Login</span>
+    </a>
+    <a href="/u/register"
+       class="flex-1 text-center px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-center gap-1.5 {% if mode == 'register' %}neu-tab-active{% else %}text-slate-400 hover:text-white hover:bg-slate-800{% endif %}">
+      <i class="fa-solid fa-user-plus text-emerald-400"></i>
+      <span>Daftar baru</span>
+    </a>
+  </div>
+
+  {% if error %}<div class="alert-error">{{ error }}</div>{% endif %}
+  {% if info %}<div class="alert-success">{{ info }}</div>{% endif %}
+
+  <div class="card">
+    {% if mode == 'register' %}
+    <h2 class="text-lg font-bold mb-1"><i class="fa-solid fa-user-plus text-emerald-400 mr-1"></i> Daftar akun WebUI baru</h2>
+    <p class="text-xs text-slate-400 mb-4">
+      Bikin akun WebUI dulu, terus di dalam lo bisa login ke <b>nomor XL lo sendiri</b> via OTP. Tiap user webui ke-isolated — orang lain nggak bisa lihat / pakai nomor lo.
+    </p>
+    <form action="/u/register" method="post" class="space-y-3">
+      <div>
+        <label class="label">Username</label>
+        <input class="form-input" type="text" name="username" value="{{ username }}" required pattern="[a-z0-9][a-z0-9_-]{2,30}" autofocus>
+        <p class="text-xs text-slate-500 mt-1">3-31 char, huruf kecil/angka/<code>_</code>/<code>-</code>, awalan huruf/angka.</p>
+      </div>
+      <div>
+        <label class="label">Password</label>
+        <input class="form-input" type="password" name="password" required minlength="6">
+        <p class="text-xs text-slate-500 mt-1">Minimal 6 karakter.</p>
+      </div>
+      <div>
+        <label class="label">Ulangi password</label>
+        <input class="form-input" type="password" name="password_confirm" required minlength="6">
+      </div>
+      <button class="btn btn-primary w-full" type="submit">Daftar & masuk</button>
+    </form>
+    <p class="text-xs text-slate-500 text-center mt-4">
+      Udah punya akun? <a href="/u/login" class="text-indigo-300 hover:text-indigo-200">Login →</a>
+    </p>
+    {% else %}
+    <h2 class="text-lg font-bold mb-1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block text-indigo-400"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg> Login WebUI</h2>
+    <p class="text-xs text-slate-400 mb-4">
+      Masukin username & password WebUI lo. Kalau belum punya, <a href="/u/register" class="text-emerald-300 hover:text-emerald-200">daftar dulu</a>.
+    </p>
+    <form action="/u/login" method="post" class="space-y-3">
+      <input type="hidden" name="next" value="{{ next }}">
+      <div>
+        <label class="label">Username</label>
+        <input class="form-input" type="text" name="username" value="{{ username }}" required pattern="[a-z0-9][a-z0-9_-]{2,30}" autofocus>
+      </div>
+      <div>
+        <label class="label">Password</label>
+        <input class="form-input" type="password" name="password" required>
+      </div>
+      <button class="btn btn-primary w-full" type="submit">Masuk</button>
+    </form>
+    <p class="text-xs text-slate-500 text-center mt-4">
+      Belum punya? <a href="/u/register" class="text-emerald-300 hover:text-emerald-200">Daftar baru →</a>
+    </p>
+    {% endif %}
+  </div>
+
+  <p class="text-center text-xs text-slate-600 mt-4">
+    {{ users_count }} user terdaftar
+  </p>
+</div>
+</body>
+</html>
